@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chairside Database Hub - Zero-IT Practice Operating System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header>
+    <div class="nav-container">
+      <a href="#" class="logo-wrapper">
+        <div class="logo-icon">C</div>
+        <div class="brand-name">Chair<span>side</span></div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#schema">DB Schema</a></li>
+          <li><a href="#playground">Interactive SQL</a></li>
+          <li><a href="#signups">Join Beta</a></li>
+          <li><a href="#signups" class="nav-btn">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>Fill Your Chairs. Eliminate <span>Phone Tag</span>.</h1>
+      <p>
+        The vertical SaaS built specifically for independent dental practices (1-4 chairs). 
+        Consolidate patient self-booking, automated text recalls, and insurance pre-authorization 
+        tracking in a secure, HIPAA-compliant PostgreSQL database architecture. 
+        Zero-IT setup required.
+      </p>
+      <div class="cta-group">
+        <a href="#signups" class="btn-primary">Reserve Beta Access</a>
+        <a href="#schema" class="btn-secondary">Explore Schema Specs</a>
+      </div>
+    </div>
+    <div class="hero-image-wrapper">
+      <img src="images/vibrant-bold-pop-illustration-of-a-denta.png" alt="Chairside Interactive Clinic Schedule Dashboard with Automated Reminders">
+    </div>
+  </section>
+
+  <!-- Value Propositions / Feature Grid -->
+  <section class="feature-section" id="features">
+    <div class="section-container">
+      <div class="section-header">
+        <h2>Built to Handle Your Toughest Administrative Bottlenecks</h2>
+        <p>
+          Chairside bypasses the feature bloat of legacy dental software to solve the three 
+          highest-leverage tasks that choke small clinic performance.
+        </p>
+      </div>
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">B</div>
+          <h3>24/7 Self-Booking Widget</h3>
+          <p>
+            Embed a lightweight booking scheduler on your clinic website or Google profile in seconds. 
+            Reads active chair availability in real-time to eliminate overlap. Writes bookings 
+            directly back to Dentrix, Eaglesoft, or Open Dental.
+          </p>
+        </div>
+        <!-- Feature 2 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">T</div>
+          <h3>Two-Way Automated SMS Recalls</h3>
+          <p>
+            Identifies patients due for six-month hygiene checkups and sends custom text links 
+            to secure a slot in seconds. Fully compliant with 10DLC registration, maintaining 
+            over 99% carrier delivery rates.
+          </p>
+        </div>
+        <!-- Feature 3 -->
+        <div class="feature-card">
+          <div class="feature-icon-box">P</div>
+          <h3>Pre-Auth Kanban Tracker</h3>
+          <p>
+            An automated tracker replacing physical sticky notes. Connects directly to insurance clearinghouses 
+            to monitor pending treatment plans. Automatically texts patients to book appointments 
+            the moment approvals arrive.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Schema Deep-Dive Section -->
+  <section class="db-section" id="schema">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 style="color: var(--deep-navy);">HIPAA-Compliant Database Architecture</h2>
+        <p style="color: var(--navy-light);">
+          Our database is engineered for millisecond response times under scale. Explore our 
+          standard Postgres table layouts, indexes, and relationship models.
+        </p>
+      </div>
+
+      <div class="db-grid">
+        <!-- Left Side: Table Selector Menu -->
+        <div class="db-menu">
+          <button class="tab-btn active" data-table="beta_signups">
+            beta_signups
+            <span>Waitlist & leads collection</span>
+          </button>
+          <button class="tab-btn" data-table="clinics">
+            clinics
+            <span>Multi-tenant clinic configuration</span>
+          </button>
+          <button class="tab-btn" data-table="patients">
+            patients
+            <span>PMS-synced client master ledger</span>
+          </button>
+          <button class="tab-btn" data-table="appointments">
+            appointments
+            <span>Booking slots & PMS integrations</span>
+          </button>
+          <button class="tab-btn" data-table="pre_authorizations">
+            pre_authorizations
+            <span>Insurance tracking Kanban records</span>
+          </button>
+          <button class="tab-btn" data-table="automated_recalls">
+            automated_recalls
+            <span>Recurrent marketing loop triggers</span>
+          </button>
+        </div>
+
+        <!-- Right Side: Visual Table Structure Card -->
+        <div class="db-content">
+          
+          <!-- Tab 1: beta_signups -->
+          <div class="db-content-panel active" id="panel-beta_signups">
+            <div class="table-header-info">
+              <h3>beta_signups <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Stores dentist waitlist signups and general practice inquiries from our public acquisition funnels.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Optimized with composite index <code>idx_beta_signups_status_created</code> 
+              to fetch active signups instantly by submission date, preventing seq scans on large waitlist campaigns.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">BIGSERIAL</td>
+                    <td>PRIMARY KEY</td>
+                    <td>Auto-incrementing unique record key.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">dentist_name</td>
+                    <td class="col-type">VARCHAR(255)</td>
+                    <td>NOT NULL</td>
+                    <td>Full name of the practicing dentist owner.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">clinic_name</td>
+                    <td class="col-type">VARCHAR(255)</td>
+                    <td>NOT NULL</td>
+                    <td>Commercial name of the clinic.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">email</td>
+                    <td class="col-type">VARCHAR(255)</td>
+                    <td>NOT NULL, UNIQUE</td>
+                    <td>Verified professional contact email.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">phone</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>NOT NULL</td>
+                    <td>Mobile/Clinic telephone for SMS notifications.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">chair_count</td>
+                    <td class="col-type">INTEGER</td>
+                    <td>CHECK (between 1 and 50)</td>
+                    <td>Size indicator (1-4 chairs is our sweet spot).</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">current_software</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>DEFAULT 'None'</td>
+                    <td>Active Practice Management System in use.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 2: clinics -->
+          <div class="db-content-panel" id="panel-clinics">
+            <div class="table-header-info">
+              <h3>clinics <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Root tenant record representing a distinct clinic location. Enforces separation of patient data.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Implements Row Level Security (RLS) linked to clinic authentication 
+              UUIDs, preventing accidental multi-tenant data bleed at the database level.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">UUID</td>
+                    <td>PRIMARY KEY, DEFAULT uuid_generate_v4()</td>
+                    <td>Unique unguessable identifier.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">name</td>
+                    <td class="col-type">VARCHAR(255)</td>
+                    <td>NOT NULL</td>
+                    <td>Registered clinic brand name.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">pms_type</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>CHECK (dentrix, eaglesoft, open_dental, etc)</td>
+                    <td>Identifies integration pipeline path.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">timezone</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>NOT NULL</td>
+                    <td>Used for text delivery timing controls.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 3: patients -->
+          <div class="db-content-panel" id="panel-patients">
+            <div class="table-header-info">
+              <h3>patients <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Stores patient records synced from local desktop databases. Serves as our message target lookup.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Optimized with composite index <code>idx_patients_lookup</code> 
+              on last name and first name for fast lookup auto-completes in the front-office search bar.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">UUID</td>
+                    <td>PRIMARY KEY</td>
+                    <td>Internal patient UUID.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">clinic_id</td>
+                    <td class="col-type">UUID</td>
+                    <td>NOT NULL, REFERENCES clinics(id)</td>
+                    <td>Foreign key linking patient to tenant.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">pms_patient_id</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>NOT NULL</td>
+                    <td>ID mapping patient to their on-premise PMS record.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">first_name</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>NOT NULL</td>
+                    <td>Patient first name.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">last_name</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>NOT NULL</td>
+                    <td>Patient last name.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">phone</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>NOT NULL</td>
+                    <td>Mobile number synced for automatic SMS delivery.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 4: appointments -->
+          <div class="db-content-panel" id="panel-appointments">
+            <div class="table-header-info">
+              <h3>appointments <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Stores booking records, chair positions, and scheduled times. Controls overlap prevention.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Employs composite range indexing <code>idx_appointments_clinic_time</code> 
+              to scan for schedule availability under 5 milliseconds during concurrent patient booking checks.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">UUID</td>
+                    <td>PRIMARY KEY</td>
+                    <td>Unique record key.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">patient_id</td>
+                    <td class="col-type">UUID</td>
+                    <td>REFERENCES patients(id)</td>
+                    <td>Patient scheduling the chair.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">chair_number</td>
+                    <td class="col-type">INTEGER</td>
+                    <td>CHECK (between 1 and 10)</td>
+                    <td>Assigned dental chair (operatory).</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">appointment_type</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>CHECK (hygiene, restorative, emergency, etc)</td>
+                    <td>Service type to determine length blocks.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">start_time</td>
+                    <td class="col-type">TIMESTAMPTZ</td>
+                    <td>NOT NULL</td>
+                    <td>Timestamp of appointment start.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">end_time</td>
+                    <td class="col-type">TIMESTAMPTZ</td>
+                    <td>NOT NULL</td>
+                    <td>Timestamp of appointment conclusion.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 5: pre_authorizations -->
+          <div class="db-content-panel" id="panel-pre_authorizations">
+            <div class="table-header-info">
+              <h3>pre_authorizations <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Powering our pre-authorization Kanban dashboard, tracking clinical claims from submission to acceptance.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Partial index <code>idx_pre_auth_aging</code> applies specifically to 
+              active 'submitted' entries, raising instant alerts for approvals outstanding for over 14 days.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">UUID</td>
+                    <td>PRIMARY KEY</td>
+                    <td>Internal unique key.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">patient_id</td>
+                    <td class="col-type">UUID</td>
+                    <td>REFERENCES patients(id)</td>
+                    <td>Associated patient requiring treatment.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">treatment_code</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>NOT NULL</td>
+                    <td>Standard ADA dental procedure code (e.g., D2740).</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">estimated_cost_cents</td>
+                    <td class="col-type">BIGINT</td>
+                    <td>NOT NULL, DEFAULT 0</td>
+                    <td>Out-of-pocket prediction stored in cents.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">status</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>CHECK (submitted, action_required, approved, etc)</td>
+                    <td>Determines visual Kanban column placement.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">reference_number</td>
+                    <td class="col-type">VARCHAR(100)</td>
+                    <td>NULLABLE</td>
+                    <td>Insurance confirmation identifier.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab 6: automated_recalls -->
+          <div class="db-content-panel" id="panel-automated_recalls">
+            <div class="table-header-info">
+              <h3>automated_recalls <span class="table-badge">PostgreSQL Table</span></h3>
+              <p>Maintains continuing care recall logs, trigger dates, and status feedback from Twilio webhooks.</p>
+            </div>
+            <div class="performance-note">
+              <strong>Performance Tuning:</strong> Optimized index on <code>status, scheduled_send_at</code> 
+              enables our automated cron script to query matching patient rows instantly, bypassing full-table scans.
+            </div>
+            <div class="schema-table-wrapper">
+              <table class="schema-table">
+                <thead>
+                  <tr>
+                    <th>Column Name</th>
+                    <th>Data Type</th>
+                    <th>Constraints</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="col-code">id</td>
+                    <td class="col-type">UUID</td>
+                    <td>PRIMARY KEY</td>
+                    <td>Unique trigger record identifier.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">patient_id</td>
+                    <td class="col-type">UUID</td>
+                    <td>REFERENCES patients(id)</td>
+                    <td>Patient targeted for recall campaign.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">status</td>
+                    <td class="col-type">VARCHAR(50)</td>
+                    <td>CHECK (scheduled, sent, delivered, responded, failed)</td>
+                    <td>Message state inside the automated recall pipeline.</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">scheduled_send_at</td>
+                    <td class="col-type">TIMESTAMPTZ</td>
+                    <td>NOT NULL</td>
+                    <td>Planned dispatch date (e.g., exactly 6 months post-cleaning).</td>
+                  </tr>
+                  <tr>
+                    <td class="col-code">booking_id</td>
+                    <td class="col-type">UUID</td>
+                    <td>REFERENCES appointments(id)</td>
+                    <td>Links recall success back to booked appointment.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive SQL & API Simulation Section -->
+  <section class="playground-section" id="playground">
+    <div class="playground-grid">
+      <!-- ER Diagram visual display -->
+      <div class="er-card">
+        <h3>Database Schema ER Model</h3>
+        <p style="margin-bottom: 1.5rem; color: rgba(255,255,255,0.8);">
+          Click any database node to jump directly to its schema definitions, primary keys, 
+          and field specifications.
+        </p>
+        <div class="er-diagram">
+          <div class="er-node active-node" data-node="beta_signups">
+            <span class="er-node-name">beta_signups</span>
+            <span class="er-relation">Public API</span>
+          </div>
+          <div class="er-node" data-node="clinics">
+            <span class="er-node-name">clinics</span>
+            <span class="er-relation">Tenant Root</span>
+          </div>
+          <div class="er-node" data-node="patients">
+            <span class="er-node-name">patients</span>
+            <span class="er-relation">clinics.id 🔑</span>
+          </div>
+          <div class="er-node" data-node="appointments">
+            <span class="er-node-name">appointments</span>
+            <span class="er-relation">patients.id 🔑</span>
+          </div>
+          <div class="er-node" data-node="pre_authorizations">
+            <span class="er-node-name">pre_authorizations</span>
+            <span class="er-relation">patients.id 🔑</span>
+          </div>
+          <div class="er-node" data-node="automated_recalls">
+            <span class="er-node-name">automated_recalls</span>
+            <span class="er-relation">patients.id 🔑</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live API Simulator Console -->
+      <div class="simulation-card">
+        <h3>Live SQL & API Payload Simulator</h3>
+        <p style="margin-bottom: 1.5rem; color: var(--navy-light);">
+          Trigger real backend actions to watch API request payloads compile and observe 
+          exactly how PostgreSQL indexes query these operations.
+        </p>
+        <div class="simulation-selector">
+          <button class="sim-btn active" data-sim="booking">Patient Self-Booking</button>
+          <button class="sim-btn" data-sim="preauth">Pre-Auth Approval</button>
+          <button class="sim-btn" data-sim="recall">Recall Cron Run</button>
+        </div>
+
+        <div class="code-title" id="sim-action-title">Action: Patient Self-Booking Web Widget</div>
+        <div style="font-size:0.85rem; margin-bottom:0.25rem; font-weight:bold; color:var(--deep-navy);">Incoming API Webhook Payload:</div>
+        <div class="code-window">
+          <pre id="payload-code">{
+  "event": "appointment.booked",
+  "clinic_id": "0a4f7000-8888-4444-bc84-99a38ff12026",
+  "patient": {
+    "first_name": "Sarah",
+    "last_name": "Miller",
+    "email": "sarah.miller@example.com",
+    "phone": "206-555-0198",
+    "dob": "1991-08-14"
+  },
+  "appointment": {
+    "chair_number": 3,
+    "appointment_type": "hygiene",
+    "start_time": "2026-05-22T09:00:00-07:00",
+    "end_time": "2026-05-22T10:00:00-07:00",
+    "notes": "Prefers morning spots, requested teeth whitening info"
+  }
+}</pre>
+        </div>
+
+        <div style="font-size:0.85rem; margin-bottom:0.25rem; font-weight:bold; color:var(--deep-navy);">Optimized PostgreSQL Transaction Executed:</div>
+        <div class="code-window" style="background-color: #0F172A; color: #38BDF8; height: 260px;">
+          <pre id="query-code">-- 1. Resolve or Create Patient Profile
+INSERT INTO patients (clinic_id, pms_patient_id, first_name, last_name, email, phone, dob)
+VALUES ('0a4f7000-8888-4444-bc84-99a38ff12026', 'PMS-89242', 'Sarah', 'Miller', 'sarah.miller@example.com', '206-555-0198', '1991-08-14')
+ON CONFLICT (clinic_id, pms_patient_id) 
+DO UPDATE SET email = EXCLUDED.email, phone = EXCLUDED.phone
+RETURNING id;
+
+-- 2. Secure Appointment with Optimistic Lock Checking (Optimized Index: idx_appointments_clinic_time)
+INSERT INTO appointments (clinic_id, patient_id, chair_number, appointment_type, start_time, end_time, status, notes)
+SELECT '0a4f7000-8888-4444-bc84-99a38ff12026', '550e8400-e29b-41d4-a716-446655440000', 3, 'hygiene', '2026-05-22 09:00:00-07', '2026-05-22 10:00:00-07', 'booked_online', 'Prefers morning spots'
+WHERE NOT EXISTS (
+    SELECT 1 FROM appointments 
+    WHERE clinic_id = '0a4f7000-8888-4444-bc84-99a38ff12026' 
+      AND chair_number = 3 
+      AND start_time < '2026-05-22 10:00:00-07' 
+      AND end_time > '2026-05-22 09:00:00-07'
+)
+RETURNING id;</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complete SQL Script Code Block -->
+  <section class="sql-section">
+    <div class="sql-container">
+      <div class="sql-bar">
+        <h3>Supabase / PostgreSQL Migration Script</h3>
+        <div class="sql-actions">
+          <button class="btn-sql-copy" id="copy-sql-btn">Copy SQL Script</button>
+        </div>
+      </div>
+      <pre class="sql-body" id="sql-code-display">-- ============================================================================
+-- Chairside Practice Operating System
+-- Core Database Schema (PostgreSQL / Supabase)
+-- Author: Chairside Database Performance & Optimization Team
+-- Target Platform: Supabase PostgreSQL (HIPAA Compliant Configuration)
+-- Generated: May 20, 2026
+-- ============================================================================
+
+BEGIN;
+
+-- Enable UUID extension for secure, unguessable public identifiers
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ============================================================================
+-- 1. Table: clinics (Multi-tenant partition)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS clinics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    pms_type VARCHAR(50) NOT NULL CHECK (pms_type IN ('dentrix', 'eaglesoft', 'open_dental', 'custom', 'none')),
+    timezone VARCHAR(100) NOT NULL DEFAULT 'America/New_York',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================================
+-- 2. Table: beta_signups
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS beta_signups (
+    id BIGSERIAL PRIMARY KEY,
+    dentist_name VARCHAR(255) NOT NULL,
+    clinic_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(50) NOT NULL,
+    chair_count INTEGER NOT NULL CHECK (chair_count BETWEEN 1 AND 50),
+    current_software VARCHAR(100) NOT NULL DEFAULT 'None / Spreadsheets',
+    signup_status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (signup_status IN ('pending', 'contacted', 'onboarded', 'archived')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Index for searching/filtering signups by status and timing
+CREATE INDEX IF NOT EXISTS idx_beta_signups_status_created ON beta_signups(signup_status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_beta_signups_email ON beta_signups(email);
+
+-- ============================================================================
+-- 3. Table: patients (Synced from PMS)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS patients (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    pms_patient_id VARCHAR(100) NOT NULL, -- External ID from Dentrix/Eaglesoft/Open Dental
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255),
+    phone VARCHAR(50) NOT NULL,
+    dob DATE NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE (clinic_id, pms_patient_id)
+);
+
+-- Critical indexes for performance on patient joins and communication lookups
+CREATE INDEX IF NOT EXISTS idx_patients_clinic_id ON patients(clinic_id);
+CREATE INDEX IF NOT EXISTS idx_patients_lookup ON patients(last_name, first_name);
+CREATE INDEX IF NOT EXISTS idx_patients_phone ON patients(phone);
+
+-- ============================================================================
+-- 4. Table: appointments (Self-Bookings and PMS Schedulers)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS appointments (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    patient_id UUID REFERENCES patients(id) ON DELETE SET NULL,
+    pms_appointment_id VARCHAR(100), -- Nullable for raw self-bookings before PMS sync
+    chair_number INTEGER NOT NULL CHECK (chair_number BETWEEN 1 AND 10),
+    appointment_type VARCHAR(50) NOT NULL DEFAULT 'hygiene' CHECK (appointment_type IN ('hygiene', 'restorative', 'emergency', 'consultation')),
+    status VARCHAR(50) NOT NULL DEFAULT 'pending_sync' CHECK (status IN ('booked_online', 'pending_sync', 'confirmed', 'cancelled', 'no_show')),
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_appointment_times CHECK (end_time > start_time)
+);
+
+-- Crucial indexes for rendering schedule grids (Range filters & joins)
+CREATE INDEX IF NOT EXISTS idx_appointments_clinic_time ON appointments(clinic_id, start_time DESC);
+CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON appointments(patient_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
+
+-- ============================================================================
+-- 5. Table: pre_authorizations (Visual tracking Kanban)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS pre_authorizations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    treatment_code VARCHAR(50) NOT NULL, -- e.g., D2740 (Crown) or D6010 (Implant)
+    treatment_description VARCHAR(255) NOT NULL,
+    insurance_carrier VARCHAR(150) NOT NULL,
+    estimated_cost_cents BIGINT NOT NULL DEFAULT 0, -- Stored in cents to avoid float rounding issues
+    approved_amount_cents BIGINT DEFAULT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'submitted' CHECK (status IN ('draft', 'submitted', 'aging_delay', 'action_required', 'approved', 'declined')),
+    reference_number VARCHAR(100),
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_checked_at TIMESTAMPTZ,
+    approved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for Kanban dashboard tracking and aging alerts
+CREATE INDEX IF NOT EXISTS idx_pre_auth_clinic_status ON pre_authorizations(clinic_id, status);
+CREATE INDEX IF NOT EXISTS idx_pre_auth_patient_id ON pre_authorizations(patient_id);
+CREATE INDEX IF NOT EXISTS idx_pre_auth_aging ON pre_authorizations(submitted_at DESC) WHERE status = 'submitted';
+
+-- ============================================================================
+-- 6. Table: automated_recalls (Continuing Care Loops)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS automated_recalls (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    recall_type VARCHAR(50) NOT NULL DEFAULT 'hygiene_6_month',
+    status VARCHAR(50) NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'sent', 'delivered', 'responded', 'failed', 'paused')),
+    scheduled_send_at TIMESTAMPTZ NOT NULL,
+    sent_at TIMESTAMPTZ,
+    booking_id UUID REFERENCES appointments(id) ON DELETE SET NULL, -- Connects recall success back to booking
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for cron jobs querying matching send triggers
+CREATE INDEX IF NOT EXISTS idx_recalls_send_trigger ON automated_recalls(status, scheduled_send_at) WHERE status = 'scheduled';
+CREATE INDEX IF NOT EXISTS idx_recalls_patient_id ON automated_recalls(patient_id);
+
+-- ============================================================================
+-- Row Level Security (RLS) Setup for HIPAA Compliance
+-- ============================================================================
+
+ALTER TABLE clinics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE patients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pre_authorizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE automated_recalls ENABLE ROW LEVEL SECURITY;
+ALTER TABLE beta_signups ENABLE ROW LEVEL SECURITY;
+
+-- Beta Signups: Anyone (anon) can insert signups; only authenticated staff can view
+CREATE POLICY signup_insert_policy ON beta_signups 
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY signup_select_policy ON beta_signups 
+    FOR SELECT TO authenticated USING (true);
+
+-- Clinics & Clinical Tables: Lock access strictly to authenticated clinic tenants
+CREATE POLICY clinic_tenant_policy ON clinics 
+    FOR ALL TO authenticated USING (id = auth.uid());
+
+CREATE POLICY patients_tenant_policy ON patients 
+    FOR ALL TO authenticated USING (clinic_id = auth.uid());
+
+CREATE POLICY appointments_tenant_policy ON appointments 
+    FOR ALL TO authenticated USING (clinic_id = auth.uid());
+
+CREATE POLICY pre_auth_tenant_policy ON pre_authorizations 
+    FOR ALL TO authenticated USING (clinic_id = auth.uid());
+
+CREATE POLICY recalls_tenant_policy ON automated_recalls 
+    FOR ALL TO authenticated USING (clinic_id = auth.uid());
+
+COMMIT;</pre>
+    </div>
+  </section>
+
+  <!-- Beta Registration and Live Database Form Section -->
+  <section class="signup-section" id="signups">
+    <div class="signup-container">
+      <div class="signup-header">
+        <h2>Join the Private Fall Beta</h2>
+        <p>Register your independent clinic (1-4 chairs) for the private cohort of 10 design partners launching soon.</p>
+      </div>
+
+      <form id="beta-signup-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="dentist_name">Dentist Name</label>
+            <input type="text" id="dentist_name" placeholder="Dr. Sarah Jenkins" required>
+          </div>
+          <div class="form-group">
+            <label for="clinic_name">Practice Name</label>
+            <input type="text" id="clinic_name" placeholder="Jenkins Dental Care" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Office Email</label>
+            <input type="email" id="email" placeholder="office@jenkinsdental.com" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">SMS-Capable Office Phone</label>
+            <input type="tel" id="phone" placeholder="206-555-0144" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chair_count">Number of Chairs</label>
+            <select id="chair_count" required>
+              <option value="1">1 Chair</option>
+              <option value="2">2 Chairs</option>
+              <option value="3" selected>3 Chairs</option>
+              <option value="4">4 Chairs</option>
+              <option value="5">5+ Chairs</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="current_software">Practice Management Software</label>
+            <select id="current_software" required>
+              <option value="Dentrix">Dentrix</option>
+              <option value="Eaglesoft">Eaglesoft</option>
+              <option value="Open Dental">Open Dental</option>
+              <option value="Other">Other Software</option>
+              <option value="None / Spreadsheets">No Software / Spreadsheets</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group form-checkbox">
+          <input type="checkbox" id="sms_consent" checked required>
+          <label for="sms_consent">
+            By checking this box, you consent to receive automated transactional text reminders 
+            and scheduling updates from Chairside on behalf of your clinic. Reply STOP to cancel anytime. 
+            View our <a href="#">HIPAA Agreement & Privacy Policy</a>.
+          </label>
+        </div>
+
+        <div class="form-feedback" id="form-feedback"></div>
+
+        <div class="submit-btn-wrapper">
+          <button type="submit" class="btn-primary submit-btn">Submit Beta Registration & Write to DB</button>
+        </div>
+      </form>
+
+      <!-- Live Database Monitor inside form card -->
+      <div class="live-monitor-wrapper">
+        <div class="monitor-header">
+          <div class="monitor-title">
+            <div class="pulse-indicator"></div>
+            PostgreSQL Live Database State [beta_signups]
+          </div>
+          <div style="font-size:0.8rem; color:#A0AEC0; font-family: monospace;">SELECT * FROM beta_signups ORDER BY created_at DESC LIMIT 5</div>
+        </div>
+        <table class="monitor-table">
+          <thead>
+            <tr>
+              <th>Clinic & Dentist</th>
+              <th>Email</th>
+              <th>Size</th>
+              <th>PMS System</th>
+              <th>Time (UTC)</th>
+            </tr>
+          </thead>
+          <tbody id="live-signups-body">
+            <!-- Populated via javascript -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-about">
+        <h3>Chairside</h3>
+        <p>
+          Chairside is the clinical-grade practice operating system engineered specifically for 1-4 chair 
+          independent dental clinics. We replace administrative paper trails and phone tag with clean, 
+          automated database triggers.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Database Architecture</h4>
+        <ul>
+          <li><a href="#schema">Postgres Tables</a></li>
+          <li><a href="#playground">SQL API Simulations</a></li>
+          <li><a href="#schema">Performance Indexes</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Product & Legal</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#signups">Join Waitlist</a></li>
+          <li><a href="#">HIPAA Compliance</a></li>
+          <li><a href="#">10DLC Registration Details</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>&copy; 2026 Chairside. All rights reserved. Built on HIPAA-Compliant PostgreSQL.</div>
+      <div>Designed for 1-4 Chair Solo Practices</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
