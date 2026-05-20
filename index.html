@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chairside Database Hub - Zero-IT Practice Operating System</title>
+  <title>Chairside - The Automated Front Desk for Independent Dental Practices</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -30,12 +30,11 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="hero-content">
-      <h1>Fill Your Chairs. Eliminate <span>Phone Tag</span>.</h1>
+      <h1>The Automated Front Desk for <br><span>Independent Dental Practices</span></h1>
       <p>
-        The vertical SaaS built specifically for independent dental practices (1-4 chairs). 
-        Consolidate patient self-booking, automated text recalls, and insurance pre-authorization 
-        tracking in a secure, HIPAA-compliant PostgreSQL database architecture. 
-        Zero-IT setup required.
+        Fill your chairs. Secure insurance pre-auths. Eliminate front-office phone tag. 
+        Chairside consolidates patient self-booking, automated text recalls, and insurance pre-authorization 
+        tracking into a single, zero-IT practice operating system built for 1-4 chair solo clinics.
       </p>
       <div class="cta-group">
         <a href="#signups" class="btn-primary">Reserve Beta Access</a>
@@ -108,7 +107,7 @@
         <div class="db-menu">
           <button class="tab-btn active" data-table="beta_signups">
             beta_signups
-            <span>Waitlist & leads collection</span>
+            <span>Waitlist and leads collection</span>
           </button>
           <button class="tab-btn" data-table="clinics">
             clinics
@@ -120,7 +119,7 @@
           </button>
           <button class="tab-btn" data-table="appointments">
             appointments
-            <span>Booking slots & PMS integrations</span>
+            <span>Booking slots and PMS integrations</span>
           </button>
           <button class="tab-btn" data-table="pre_authorizations">
             pre_authorizations
@@ -475,7 +474,7 @@
                   <tr>
                     <td class="col-code">status</td>
                     <td class="col-type">VARCHAR(50)</td>
-                    <td>CHECK (scheduled, sent, delivered, responded, failed)</td>
+                    <td>CHECK (scheduled, sent, delivered, responded, failed, paused)</td>
                     <td>Message state inside the automated recall pipeline.</td>
                   </tr>
                   <tr>
@@ -500,7 +499,7 @@
     </div>
   </section>
 
-  <!-- Interactive SQL & API Simulation Section -->
+  <!-- Interactive SQL and API Simulation Section -->
   <section class="playground-section" id="playground">
     <div class="playground-grid">
       <!-- ER Diagram visual display -->
@@ -521,26 +520,26 @@
           </div>
           <div class="er-node" data-node="patients">
             <span class="er-node-name">patients</span>
-            <span class="er-relation">clinics.id 🔑</span>
+            <span class="er-relation">clinics.id (FK)</span>
           </div>
           <div class="er-node" data-node="appointments">
             <span class="er-node-name">appointments</span>
-            <span class="er-relation">patients.id 🔑</span>
+            <span class="er-relation">patients.id (FK)</span>
           </div>
           <div class="er-node" data-node="pre_authorizations">
             <span class="er-node-name">pre_authorizations</span>
-            <span class="er-relation">patients.id 🔑</span>
+            <span class="er-relation">patients.id (FK)</span>
           </div>
           <div class="er-node" data-node="automated_recalls">
             <span class="er-node-name">automated_recalls</span>
-            <span class="er-relation">patients.id 🔑</span>
+            <span class="er-relation">patients.id (FK)</span>
           </div>
         </div>
       </div>
 
       <!-- Live API Simulator Console -->
       <div class="simulation-card">
-        <h3>Live SQL & API Payload Simulator</h3>
+        <h3>Live SQL and API Payload Simulator</h3>
         <p style="margin-bottom: 1.5rem; color: var(--navy-light);">
           Trigger real backend actions to watch API request payloads compile and observe 
           exactly how PostgreSQL indexes query these operations.
@@ -611,7 +610,7 @@ RETURNING id;</pre>
       <pre class="sql-body" id="sql-code-display">-- ============================================================================
 -- Chairside Practice Operating System
 -- Core Database Schema (PostgreSQL / Supabase)
--- Author: Chairside Database Performance & Optimization Team
+-- Author: Chairside Database Performance and Optimization Team
 -- Target Platform: Supabase PostgreSQL (HIPAA Compliant Configuration)
 -- Generated: May 20, 2026
 -- ============================================================================
@@ -763,7 +762,7 @@ CREATE POLICY signup_insert_policy ON beta_signups
 CREATE POLICY signup_select_policy ON beta_signups 
     FOR SELECT TO authenticated USING (true);
 
--- Clinics & Clinical Tables: Lock access strictly to authenticated clinic tenants
+-- Clinics and Clinical Tables: Lock access strictly to authenticated clinic tenants
 CREATE POLICY clinic_tenant_policy ON clinics 
     FOR ALL TO authenticated USING (id = auth.uid());
 
@@ -842,7 +841,7 @@ COMMIT;</pre>
           <label for="sms_consent">
             By checking this box, you consent to receive automated transactional text reminders 
             and scheduling updates from Chairside on behalf of your clinic. Reply STOP to cancel anytime. 
-            View our <a href="#">HIPAA Agreement & Privacy Policy</a>.
+            View our <a href="#">HIPAA Agreement and Privacy Policy</a>.
           </label>
         </div>
 
