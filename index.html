@@ -18,6 +18,7 @@
       <nav>
         <a href="#problem">THE PROBLEM</a>
         <a href="#solution">THE SOLUTION</a>
+        <a href="#demo">LIVE DEMO</a>
         <a href="#schema">DB SCHEMA</a>
         <a href="#playground">INTERACTIVE SQL</a>
         <a href="#waitlist" class="nav-cta">JOIN BETA</a>
@@ -35,8 +36,8 @@
           Chairside automates patient self-booking, text recalls, and insurance pre-authorization tracking for independent 1-4 chair dental practices. No local servers to maintain. No IT contractors to pay. Built to run alongside your existing PMS.
         </p>
         <div class="cta-container">
-          <a href="#waitlist" class="btn-primary">RESERVE BETA ACCESS</a>
-          <a href="#schema" class="btn-secondary">EXPLORE SCHEMA</a>
+          <a href="#demo" class="btn-primary">TRY INTERACTIVE DEMO</a>
+          <a href="#waitlist" class="btn-secondary">RESERVE BETA ACCESS</a>
         </div>
       </div>
       <div class="hero-image">
@@ -97,6 +98,174 @@
       </div>
     </div>
   </section>
+
+  <!-- LIVE INTERACTIVE BOOKING DEMO SECTION -->
+  <section id="demo" class="section-white border-top-thick">
+    <div class="grid-container-wide">
+      <div class="demo-intro">
+        <h2 class="section-title text-center">LIVE DEMO: PATIENT SELF-BOOKING WIDGET</h2>
+        <p class="section-subtitle text-center">Test the actual patient flow below. Book a simulated appointment as a patient, and watch the clinic's 1-4 chair scheduler update instantly.</p>
+      </div>
+
+      <div class="demo-split">
+        <!-- Patient Widget Panel -->
+        <div class="demo-card-container">
+          <div class="panel-header">PATIENT-FACING SCHEDULING WIDGET</div>
+          
+          <div class="booking-widget" id="booking-widget-box">
+            <!-- Widget Steps Indicator -->
+            <div class="widget-steps">
+              <div class="step-indicator active" id="step-ind-1">1. SERVICE</div>
+              <div class="step-indicator" id="step-ind-2">2. TIME SLOT</div>
+              <div class="step-indicator" id="step-ind-3">3. DETAILS</div>
+            </div>
+
+            <!-- Step 1: Treatment Selection -->
+            <div class="widget-step-panel active" id="widget-step-1">
+              <h4>SELECT DENTAL TREATMENT</h4>
+              <p class="widget-desc">Select a non-jargon service to see optimized chair slot availability.</p>
+              
+              <div class="treatment-options">
+                <div class="treatment-card" data-service="Routine Cleaning & Exam" data-duration="60" data-chair="1">
+                  <div class="treatment-meta">
+                    <span class="badge-mint">POPULAR</span>
+                    <span class="duration">60 MIN</span>
+                  </div>
+                  <h5>ROUTINE CLEANING & EXAM</h5>
+                  <p>Standard preventive scaling, polishing, diagnostic exam, and digital X-rays.</p>
+                </div>
+
+                <div class="treatment-card" data-service="Problem Focused Exam" data-duration="60" data-chair="3">
+                  <div class="treatment-meta">
+                    <span class="badge-coral">DIAGNOSTIC</span>
+                    <span class="duration">60 MIN</span>
+                  </div>
+                  <h5>PROBLEM FOCUSED EXAM</h5>
+                  <p>Urgent localized evaluation for specific tooth pain, loose crown, or minor dental emergencies.</p>
+                </div>
+
+                <div class="treatment-card" data-service="Restorative Consultation" data-duration="60" data-chair="4">
+                  <div class="treatment-meta">
+                    <span class="badge-neutral">CONSULT</span>
+                    <span class="duration">60 MIN</span>
+                  </div>
+                  <h5>RESTORATIVE CONSULTATION</h5>
+                  <p>Comprehensive planning and estimates for crowns, implants, or cosmetic treatment plans.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Time Selector -->
+            <div class="widget-step-panel" id="widget-step-2">
+              <div class="panel-back-row">
+                <button type="button" class="btn-back" id="back-to-step-1">BACK TO SERVICES</button>
+              </div>
+              <h4>SELECT DATE & TIME</h4>
+              <p class="widget-desc">Showing optimized times that prevent fragmented schedule gaps.</p>
+              
+              <div class="date-selector">
+                <button type="button" class="date-tab active" data-date="2026-05-21">THU MAY 21</button>
+                <button type="button" class="date-tab" data-date="2026-05-22">FRI MAY 22</button>
+                <button type="button" class="date-tab" data-date="2026-05-25">MON MAY 25</button>
+              </div>
+
+              <div class="time-slots-grid" id="available-slots-container">
+                <!-- Loaded dynamically based on service -->
+              </div>
+            </div>
+
+            <!-- Step 3: Details -->
+            <div class="widget-step-panel" id="widget-step-3">
+              <div class="panel-back-row">
+                <button type="button" class="btn-back" id="back-to-step-2">BACK TO TIMEFRAMES</button>
+              </div>
+              <h4>CONFIRM YOUR APPOINTMENT</h4>
+              <p class="widget-desc">Fill in secure details to sync immediately with clinic schedules.</p>
+
+              <div class="selected-summary-card" id="summary-card-text">
+                <!-- Summary of selection -->
+              </div>
+
+              <form id="widget-details-form" onsubmit="return false;">
+                <div class="form-group margin-bottom-sm">
+                  <label for="widget_patient_name">PATIENT FULL NAME</label>
+                  <input type="text" id="widget_patient_name" placeholder="E.G. ARTHUR DENT" required>
+                </div>
+                <div class="form-group margin-bottom-sm">
+                  <label for="widget_patient_phone">MOBILE PHONE (RECALL INTEGRATION)</label>
+                  <input type="tel" id="widget_patient_phone" placeholder="E.G. (206) 555-0198" required>
+                </div>
+                <div class="form-group margin-bottom-sm">
+                  <label for="widget_patient_email">EMAIL ADDRESS</label>
+                  <input type="email" id="widget_patient_email" placeholder="E.G. ARTHUR@GALAXY.COM" required>
+                </div>
+
+                <div class="form-checkbox margin-bottom-md">
+                  <input type="checkbox" id="widget_sms_consent" checked required>
+                  <label for="widget_sms_consent">
+                    I consent to receive automated appointment confirmations and reminder text messages from the clinic. Standard carrier rates apply.
+                  </label>
+                </div>
+
+                <button type="submit" class="btn-primary form-submit" id="widget-confirm-booking-btn">CONFIRM SIMULATED APPOINTMENT</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clinic Calendar Scheduler -->
+        <div class="demo-card-container">
+          <div class="panel-header live-scheduler-header">
+            <span>CLINIC MAIN TIMELINE (1-4 CHAIR CAPACITY)</span>
+            <div class="live-pulse-container">
+              <div class="indicator-pulse"></div>
+              <span>LIVE VIEWER</span>
+            </div>
+          </div>
+
+          <div class="scheduler-container">
+            <div class="scheduler-grid">
+              <!-- Calendar Header: Chair Columns -->
+              <div class="scheduler-grid-header">
+                <div class="time-col-header">TIME</div>
+                <div class="chair-col-header">CHAIR 1<br><span class="chair-type">HYGIENE</span></div>
+                <div class="chair-col-header">CHAIR 2<br><span class="chair-type">HYGIENE</span></div>
+                <div class="chair-col-header">CHAIR 3<br><span class="chair-type">DIAGNOSTIC</span></div>
+                <div class="chair-col-header">CHAIR 4<br><span class="chair-type">DOCTOR</span></div>
+              </div>
+
+              <!-- Calendar Timeline Body -->
+              <div class="scheduler-body" id="timeline-slots-body">
+                <!-- Rendered dynamically with pre-existing bookings and slots -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALL-TO-ACTION COHORT WAITLIST POP-UP MODAL -->
+  <div class="modal-overlay" id="success-cta-modal">
+    <div class="modal-card">
+      <div class="modal-badge">DATABASE TRANSACTION COMMITTED</div>
+      <h3>SIMULATED APPOINTMENT LOGGED SECURELY!</h3>
+      <p class="modal-intro">Your simulated booking has been successfully inserted into the PostgreSQL timeline database. A mock Twilio text recall reminder has also been queued.</p>
+      
+      <div class="booking-receipt" id="modal-receipt-content">
+        <!-- Filled via Javascript -->
+      </div>
+
+      <div class="modal-cta-box">
+        <h4>READY TO ACTIVATE THIS IN YOUR PRACTICE?</h4>
+        <p>Get the lightweight "front-office sidecar" that replaces phone tag, eliminates sticky notes, and keeps your chairs filled. Setup takes only 15 minutes with zero IT complexity.</p>
+        <div class="modal-btn-row">
+          <button type="button" class="btn-primary" id="modal-join-beta-btn">JOIN BETA COHORT NOW</button>
+          <button type="button" class="btn-secondary" id="modal-close-btn">DISMISS</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- DB Schema Explorer Section -->
   <section id="schema" class="section-gray">

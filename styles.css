@@ -18,6 +18,10 @@
   --light-gray: #F2F2F2;
   --dark-gray: #1C1C1C;
   --border-color: #000000;
+  --primary-teal: #0E7490;
+  --primary-teal-hover: #0891B2;
+  --secondary-mint: #0D9488;
+  --accent-coral: #E11D48;
   
   --font-heading: 'Bebas Neue', sans-serif;
   --font-body: 'Roboto', sans-serif;
@@ -93,6 +97,12 @@ p {
   gap: 4rem;
 }
 
+.grid-container-wide {
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 @media (max-width: 992px) {
   .grid-container {
     grid-template-columns: 1fr;
@@ -110,6 +120,10 @@ p {
   background-color: var(--light-gray);
   padding: 6rem 2rem;
   border-bottom: 2px solid var(--black);
+}
+
+.border-top-thick {
+  border-top: 4px solid var(--black);
 }
 
 .accent-line {
@@ -331,6 +345,519 @@ nav a:hover {
   color: var(--accent-red);
   line-height: 1;
   margin-bottom: 1rem;
+}
+
+/* INTERACTIVE BOOKING DEMO SECTION */
+.demo-intro {
+  margin-bottom: 3rem;
+}
+.text-center {
+  text-align: center;
+}
+
+.demo-split {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .demo-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.demo-card-container {
+  border: 3px solid var(--black);
+  background-color: var(--white);
+}
+
+.panel-header {
+  background-color: var(--black);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.live-scheduler-header {
+  background-color: var(--dark-gray);
+  border-bottom: 2px solid var(--black);
+}
+
+.live-pulse-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #00FF66;
+}
+
+.booking-widget {
+  padding: 2rem;
+  min-height: 580px;
+  display: flex;
+  flex-direction: column;
+}
+
+.widget-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border: 2px solid var(--black);
+  margin-bottom: 2rem;
+}
+
+.step-indicator {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background-color: var(--light-gray);
+  color: #777;
+  border-right: 2px solid var(--black);
+}
+
+.step-indicator:last-child {
+  border-right: none;
+}
+
+.step-indicator.active {
+  background-color: var(--black);
+  color: var(--white);
+}
+
+.widget-step-panel {
+  display: none;
+}
+
+.widget-step-panel.active {
+  display: block;
+}
+
+.widget-desc {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* Treatment Options */
+.treatment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.treatment-card {
+  border: 2px solid var(--black);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.treatment-card:hover {
+  background-color: var(--light-gray);
+}
+
+.treatment-card.selected {
+  background-color: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.treatment-card.selected p {
+  color: #ccc;
+}
+
+.treatment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.badge-mint {
+  background-color: var(--secondary-mint);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.badge-coral {
+  background-color: var(--accent-coral);
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.badge-neutral {
+  background-color: #666;
+  color: var(--white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.duration {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+/* Date & Time Selectors */
+.panel-back-row {
+  margin-bottom: 1rem;
+}
+
+.btn-back {
+  background: transparent;
+  border: 1px solid var(--black);
+  padding: 0.4rem 0.8rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.btn-back:hover {
+  background-color: var(--black);
+  color: var(--white);
+}
+
+.date-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.date-tab {
+  background-color: var(--white);
+  border: 2px solid var(--black);
+  padding: 0.75rem 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+
+.date-tab.active {
+  background-color: var(--black);
+  color: var(--white);
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--black);
+  padding: 0.5rem;
+}
+
+.time-slot-btn {
+  background-color: var(--white);
+  border: 2px solid var(--black);
+  padding: 0.75rem;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.time-slot-btn:hover {
+  background-color: var(--light-gray);
+  border-color: var(--accent-red);
+}
+
+.time-slot-btn.selected {
+  background-color: var(--accent-red);
+  color: var(--white);
+  border-color: var(--accent-red);
+}
+
+.time-slot-btn.disabled {
+  background-color: #f0f0f0;
+  color: #bbb;
+  border-color: #ddd;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Details Panel styles */
+.selected-summary-card {
+  background-color: var(--light-gray);
+  border-left: 5px solid var(--accent-red);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.selected-summary-card strong {
+  text-transform: uppercase;
+  color: var(--black);
+}
+
+.margin-bottom-sm {
+  margin-bottom: 1rem;
+}
+
+.margin-bottom-md {
+  margin-bottom: 1.5rem;
+}
+
+/* Scheduler / Timeline layout */
+.scheduler-container {
+  padding: 1rem;
+  background-color: var(--light-gray);
+  overflow-x: auto;
+}
+
+.scheduler-grid {
+  min-width: 600px;
+}
+
+.scheduler-grid-header {
+  display: grid;
+  grid-template-columns: 80px repeat(4, 1fr);
+  border-bottom: 2px solid var(--black);
+  padding-bottom: 0.5rem;
+}
+
+.time-col-header, .chair-col-header {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.chair-type {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: #666;
+  font-weight: bold;
+}
+
+.scheduler-body {
+  position: relative;
+  background-color: var(--white);
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 80px repeat(4, 1fr);
+  height: 60px;
+  border-bottom: 1px solid #ddd;
+}
+
+.timeline-time-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border-right: 1px solid #ddd;
+  background-color: var(--light-gray);
+}
+
+.timeline-cell {
+  border-right: 1px solid #eee;
+  position: relative;
+  background-color: var(--white);
+  transition: background-color 0.2s ease;
+}
+
+.timeline-cell:last-child {
+  border-right: none;
+}
+
+/* Appointment block overlay styles */
+.appt-block {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background-color: #ddd;
+  border-left: 4px solid #666;
+  padding: 0.4rem;
+  font-size: 0.75rem;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.appt-block.occupied {
+  background-color: #fce8e6;
+  border-color: var(--accent-coral);
+  color: #8c1d18;
+}
+
+.appt-block.scheduled {
+  background-color: #e6f4ea;
+  border-color: var(--secondary-mint);
+  color: #137333;
+}
+
+.appt-block.active-booking {
+  background-color: #e8f0fe;
+  border-color: var(--primary-teal);
+  color: #1a73e8;
+  animation: apptPulse 2s infinite;
+}
+
+@keyframes apptPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.98); background-color: #d2e3fc; }
+  100% { transform: scale(1); }
+}
+
+.appt-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.appt-patient {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* Modal Overlay styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-card {
+  background-color: var(--white);
+  border: 4px solid var(--black);
+  width: 90%;
+  max-width: 600px;
+  padding: 3rem;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .modal-card {
+    padding: 2rem;
+  }
+}
+
+.modal-badge {
+  background-color: #00FF66;
+  color: var(--black);
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.modal-intro {
+  font-size: 1.05rem;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+.booking-receipt {
+  border: 2px dashed var(--black);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  background-color: var(--light-gray);
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-size: 0.9rem;
+}
+
+.receipt-row:last-child {
+  border-bottom: none;
+}
+
+.receipt-row strong {
+  font-family: monospace;
+  font-size: 0.95rem;
+}
+
+.modal-cta-box {
+  background-color: var(--black);
+  color: var(--white);
+  padding: 2rem;
+}
+
+.modal-cta-box h4 {
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.modal-cta-box p {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-btn-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-btn-row .btn-secondary {
+  border-color: var(--white);
+  color: var(--white);
+}
+
+.modal-btn-row .btn-secondary:hover {
+  background-color: var(--white);
+  color: var(--black);
 }
 
 /* DB Schema Elements */

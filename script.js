@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Render mock signups inside the monitor
   renderMockSignups();
 
+  // Initialize interactive schedule and appointment simulation state
+  initializeTimelineAndDemo();
+
   // Tab switching logic for DB Schema specs
   const tabButtons = document.querySelectorAll('.tab-btn');
   const panels = document.querySelectorAll('.db-panel');
@@ -248,6 +251,276 @@ LIMIT 50;`
         <td style="color:#00FF66; font-family:monospace; font-weight:bold;">${timeStr}</td>
       `;
       tableBody.appendChild(tr);
+    });
+  }
+
+  // ============================================================================
+  // INTERACTIVE SCHEDULER & BOOKING DEMO
+  // ============================================================================
+  function initializeTimelineAndDemo() {
+    // Current Active Booking State variables
+    let selectedService = '';
+    let selectedDuration = 60;
+    let selectedChair = 1;
+    let selectedDate = '2026-05-21';
+    let selectedTime = '';
+
+    // Standard clinical timeline working hours: 08:00 to 17:00 (5:00 PM)
+    const times = [
+      '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'
+    ];
+
+    // Initial pre-existing clinical scheduler appointments
+    let appointments = [
+      { id: '1', chair: 1, date: '2026-05-21', time: '08:00', treatment: 'Preventive Recall', patient: 'Sarah Connor', status: 'occupied' },
+      { id: '2', chair: 1, date: '2026-05-21', time: '11:00', treatment: 'Hygiene Polish', patient: 'Luke Skywalker', status: 'occupied' },
+      { id: '3', chair: 2, date: '2026-05-21', time: '09:00', treatment: 'Routine Exam', patient: 'Ellen Ripley', status: 'occupied' },
+      { id: '4', chair: 2, date: '2026-05-21', time: '14:00', treatment: 'Hygiene Maintenance', patient: 'Indiana Jones', status: 'occupied' },
+      { id: '5', chair: 3, date: '2026-05-21', time: '10:00', treatment: 'Emergency Diagnostic', patient: 'Bruce Wayne', status: 'occupied' },
+      { id: '6', chair: 4, date: '2026-05-21', time: '13:00', treatment: 'Invisalign consult', patient: 'Tony Stark', status: 'occupied' },
+      
+      // May 22 appointments
+      { id: '7', chair: 1, date: '2026-05-22', time: '09:00', treatment: 'Preventive Recall', patient: 'Clark Kent', status: 'occupied' },
+      { id: '8', chair: 3, date: '2026-05-22', time: '15:00', treatment: 'Diagnostic Check', patient: 'Peter Parker', status: 'occupied' },
+      
+      // May 25 appointments
+      { id: '9', chair: 4, date: '2026-05-25', time: '10:00', treatment: 'Implant Consult', patient: 'Diana Prince', status: 'occupied' }
+    ];
+
+    // Render timeline based on selected date
+    function renderTimeline() {
+      const body = document.getElementById('timeline-slots-body');
+      if (!body) return;
+      body.innerHTML = '';
+
+      times.forEach(time => {
+        const row = document.createElement('div');
+        row.className = 'timeline-row';
+
+        // Time Label column
+        const label = document.createElement('div');
+        label.className = 'timeline-time-label';
+        label.textContent = convertTo12Hour(time);
+        row.appendChild(label);
+
+        // Chair columns 1 to 4
+        for (let chairNum = 1; chairNum <= 4; chairNum++) {
+          const cell = document.createElement('div');
+          cell.className = 'timeline-cell';
+          cell.setAttribute('data-chair', chairNum);
+          cell.setAttribute('data-time', time);
+
+          // Find if there is an appointment scheduled in this block
+          const match = appointments.find(appt => 
+            appt.date === selectedDate && 
+            appt.chair === chairNum && 
+            appt.time === time
+          );
+
+          if (match) {
+            const block = document.createElement('div');
+            block.className = `appt-block ${match.status}`;
+            block.innerHTML = `
+              <div class="appt-title">${match.treatment}</div>
+              <div class="appt-patient">${match.patient}</div>
+            `;
+            cell.appendChild(block);
+          }
+
+          row.appendChild(cell);
+        }
+
+        body.appendChild(row);
+      });
+    }
+
+    // Helper: Convert "14:00" -> "02:00 PM"
+    function convertTo12Hour(timeStr) {
+      const hour = parseInt(timeStr.split(':')[0]);
+      if (hour === 12) return '12:00 PM';
+      if (hour > 12) return `${hour - 12}:00 PM`;
+      return `${hour}:00 AM`;
+    }
+
+    // Initial render
+    renderTimeline();
+
+    // Treatment selections trigger Step 2
+    const treatmentCards = document.querySelectorAll('.treatment-card');
+    treatmentCards.forEach(card => {
+      card.addEventListener('click', () => {
+        treatmentCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+
+        selectedService = card.getAttribute('data-service');
+        selectedDuration = parseInt(card.getAttribute('data-duration'));
+        selectedChair = parseInt(card.getAttribute('data-chair'));
+
+        // Transition Step 1 to Step 2
+        document.getElementById('step-ind-1').classList.remove('active');
+        document.getElementById('step-ind-2').classList.add('active');
+        document.getElementById('widget-step-1').classList.remove('active');
+        document.getElementById('widget-step-2').classList.add('active');
+
+        // Dynamically populate slots
+        populateAvailableSlots();
+      });
+    });
+
+    // Back to Step 1
+    document.getElementById('back-to-step-1').addEventListener('click', () => {
+      document.getElementById('step-ind-2').classList.remove('active');
+      document.getElementById('step-ind-1').classList.add('active');
+      document.getElementById('widget-step-2').classList.remove('active');
+      document.getElementById('widget-step-1').classList.add('active');
+    });
+
+    // Date Tabs selection
+    const dateTabs = document.querySelectorAll('.date-tab');
+    dateTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        dateTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        selectedDate = tab.getAttribute('data-date');
+        renderTimeline();
+        populateAvailableSlots();
+      });
+    });
+
+    // Generate and render available slots
+    function populateAvailableSlots() {
+      const container = document.getElementById('available-slots-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      times.forEach(time => {
+        // Check if there is already an occupied appointment on this specific chair/time
+        const isOccupied = appointments.some(appt => 
+          appt.date === selectedDate && 
+          appt.chair === selectedChair && 
+          appt.time === time
+        );
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `time-slot-btn ${isOccupied ? 'disabled' : ''}`;
+        btn.textContent = convertTo12Hour(time);
+        btn.setAttribute('data-time', time);
+
+        if (!isOccupied) {
+          btn.addEventListener('click', () => {
+            const allBtns = container.querySelectorAll('.time-slot-btn');
+            allBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+
+            selectedTime = time;
+
+            // Transition from Step 2 to Step 3
+            document.getElementById('step-ind-2').classList.remove('active');
+            document.getElementById('step-ind-3').classList.add('active');
+            document.getElementById('widget-step-2').classList.remove('active');
+            document.getElementById('widget-step-3').classList.add('active');
+
+            // Set Summary text
+            const summaryText = document.getElementById('summary-card-text');
+            const formatSelectedDate = new Date(selectedDate).toLocaleDateString([], {
+              weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+            });
+            summaryText.innerHTML = `
+              <strong>Service:</strong> ${selectedService}<br>
+              <strong>Date:</strong> ${formatSelectedDate}<br>
+              <strong>Time Slot:</strong> ${convertTo12Hour(selectedTime)} (Chair ${selectedChair})
+            `;
+          });
+        }
+
+        container.appendChild(btn);
+      });
+    }
+
+    // Back to Step 2
+    document.getElementById('back-to-step-2').addEventListener('click', () => {
+      document.getElementById('step-ind-3').classList.remove('active');
+      document.getElementById('step-ind-2').classList.add('active');
+      document.getElementById('widget-step-3').classList.remove('active');
+      document.getElementById('widget-step-2').classList.add('active');
+    });
+
+    // Submit details form inside interactive demo widget
+    const detailsForm = document.getElementById('widget-details-form');
+    detailsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const patientName = document.getElementById('widget_patient_name').value.trim();
+      const patientPhone = document.getElementById('widget_patient_phone').value.trim();
+      const patientEmail = document.getElementById('widget_patient_email').value.trim();
+      const consentChecked = document.getElementById('widget_sms_consent').checked;
+
+      if (!consentChecked) {
+        alert("Patient must consent to receiving operational updates to book successfully.");
+        return;
+      }
+
+      // 1. Log simulated booking into local appointments state
+      const newAppt = {
+        id: (appointments.length + 1).toString(),
+        chair: selectedChair,
+        date: selectedDate,
+        time: selectedTime,
+        treatment: selectedService,
+        patient: patientName,
+        status: 'active-booking'
+      };
+
+      appointments.push(newAppt);
+
+      // 2. Re-render visual timeline scheduler
+      renderTimeline();
+
+      // 3. Prepare Receipt markup
+      const receiptContent = document.getElementById('modal-receipt-content');
+      receiptContent.innerHTML = `
+        <div class="receipt-row"><span>PATIENT NAME</span><strong>${patientName.toUpperCase()}</strong></div>
+        <div class="receipt-row"><span>PATIENT PHONE</span><strong>${patientPhone}</strong></div>
+        <div class="receipt-row"><span>ASSIGNED OPERATORY</span><strong>CHAIR ${selectedChair}</strong></div>
+        <div class="receipt-row"><span>TREATMENT TYPE</span><strong>${selectedService}</strong></div>
+        <div class="receipt-row"><span>APPOINTMENT DATE</span><strong>${selectedDate}</strong></div>
+        <div class="receipt-row"><span>START TIME</span><strong>${convertTo12Hour(selectedTime)}</strong></div>
+        <div class="receipt-row"><span>SMS DELIV. RECEIPT</span><strong>QUEUED (ID: TX-${Math.floor(Math.random() * 90000) + 10000})</strong></div>
+      `;
+
+      // 4. Reset Patient Widget back to Step 1
+      detailsForm.reset();
+      document.getElementById('widget_sms_consent').checked = true;
+      treatmentCards.forEach(c => c.classList.remove('selected'));
+      document.getElementById('step-ind-3').classList.remove('active');
+      document.getElementById('step-ind-1').classList.add('active');
+      document.getElementById('widget-step-3').classList.remove('active');
+      document.getElementById('widget-step-1').classList.add('active');
+
+      // 5. Trigger the call-to-action waitlist pop-up modal
+      document.getElementById('success-cta-modal').classList.add('active');
+    });
+
+    // Dismiss modal handler
+    document.getElementById('modal-close-btn').addEventListener('click', () => {
+      document.getElementById('success-cta-modal').classList.remove('active');
+    });
+
+    // Join Beta from modal handler: Dismisses modal, scrolls down to the waitlist section, and focuses form.
+    document.getElementById('modal-join-beta-btn').addEventListener('click', () => {
+      document.getElementById('success-cta-modal').classList.remove('active');
+      
+      const waitlistSection = document.getElementById('waitlist');
+      if (waitlistSection) {
+        waitlistSection.scrollIntoView({ behavior: 'smooth' });
+        // Focus first field
+        setTimeout(() => {
+          const dentistField = document.getElementById('dentist_name');
+          if (dentistField) dentistField.focus();
+        }, 800);
+      }
     });
   }
 });
