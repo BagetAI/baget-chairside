@@ -1,172 +1,154 @@
--- ============================================================================
--- Chairside Practice Operating System
--- Core Database Schema (PostgreSQL / Supabase)
--- Author: Chairside Database Performance & Optimization Team
--- Target Platform: Supabase PostgreSQL (HIPAA Compliant Configuration)
--- Generated: May 20, 2026
--- ============================================================================
+-- baza_chairside: Chairside PostgreSQL Database Schema
+-- Multi-tenant schema designed for independent 1-4 chair dental clinics.
+-- Highly optimized for performance, zero-IT overhead, and automated operations.
 
 BEGIN;
 
--- Enable UUID extension for secure, unguessable public identifiers
+-- 1. EXTENSIONS
+-- Enable UUID generation and text search support
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "citext";
 
--- ============================================================================
--- 1. Table: clinics (Multi-tenant partition)
--- ============================================================================
-CREATE TABLE IF NOT EXISTS clinics (
+-- 2. CLINICS (TENANTS)
+-- Since Chairside is sold per-location as a monthly subscription, multi-tenancy starts here.
+CREATE TABLE clinics (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
-    pms_type VARCHAR(50) NOT NULL CHECK (pms_type IN ('dentrix', 'eaglesoft', 'open_dental', 'custom', 'none')),
+    subdomain citext UNIQUE NOT NULL,
+    phone_number VARCHAR(20) NOT NULL, -- The practice phone number
     timezone VARCHAR(100) NOT NULL DEFAULT 'America/New_York',
+    sms_recall_template TEXT NOT NULL DEFAULT 'Hi {{patient_name}}, it has been 6 months since your last cleaning. Book your next appointment here: {{booking_url}}',
+    subscription_status VARCHAR(50) NOT NULL DEFAULT 'trialing', -- trialing, active, past_due, canceled
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- ============================================================================
--- 2. Table: beta_signups
--- ============================================================================
-CREATE TABLE IF NOT EXISTS beta_signups (
-    id BIGSERIAL PRIMARY KEY,
-    dentist_name VARCHAR(255) NOT NULL,
-    clinic_name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(50) NOT NULL,
-    chair_count INTEGER NOT NULL CHECK (chair_count BETWEEN 1 AND 50),
-    current_software VARCHAR(100) NOT NULL DEFAULT 'None / Spreadsheets',
-    signup_status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (signup_status IN ('pending', 'contacted', 'onboarded', 'archived')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+-- Index for quick lookups by subdomain
+CREATE INDEX idx_clinics_subdomain ON clinics(subdomain);
 
--- Index for searching/filtering signups by status and timing
-CREATE INDEX IF NOT EXISTS idx_beta_signups_status_created ON beta_signups(signup_status, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_beta_signups_email ON beta_signups(email);
-
--- ============================================================================
--- 3. Table: patients (Synced from PMS)
--- ============================================================================
-CREATE TABLE IF NOT EXISTS patients (
+-- 3. PATIENTS
+CREATE TABLE patients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
-    pms_patient_id VARCHAR(100) NOT NULL, -- External ID from Dentrix/Eaglesoft/Open Dental
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(255),
-    phone VARCHAR(50) NOT NULL,
-    dob DATE NOT NULL,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    email citext,
+    phone VARCHAR(20) NOT NULL, -- Required for automated recall texts
+    date_of_birth DATE NOT NULL,
+    last_recall_at TIMESTAMPTZ,
+    next_recall_due_date DATE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    UNIQUE (clinic_id, pms_patient_id)
+    -- Constraint: Patient phone numbers should be unique per clinic to avoid duplicate texting
+    CONSTRAINT uq_patient_phone_per_clinic UNIQUE (clinic_id, phone)
 );
 
--- Critical indexes for performance on patient joins and communication lookups
-CREATE INDEX IF NOT EXISTS idx_patients_clinic_id ON patients(clinic_id);
-CREATE INDEX IF NOT EXISTS idx_patients_lookup ON patients(last_name, first_name);
-CREATE INDEX IF NOT EXISTS idx_patients_phone ON patients(phone);
+-- Indexes for patient lookups
+CREATE INDEX idx_patients_clinic_name ON patients(clinic_id, last_name, first_name);
+CREATE INDEX idx_patients_recall ON patients(clinic_id, next_recall_due_date) WHERE next_recall_due_date IS NOT NULL;
 
--- ============================================================================
--- 4. Table: appointments (Self-Bookings and PMS Schedulers)
--- ============================================================================
-CREATE TABLE IF NOT EXISTS appointments (
+-- 4. APPOINTMENTS
+CREATE TABLE appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
-    patient_id UUID REFERENCES patients(id) ON DELETE SET NULL,
-    pms_appointment_id VARCHAR(100), -- Nullable for raw self-bookings before PMS sync
-    chair_number INTEGER NOT NULL CHECK (chair_number BETWEEN 1 AND 10),
-    appointment_type VARCHAR(50) NOT NULL DEFAULT 'hygiene' CHECK (appointment_type IN ('hygiene', 'restorative', 'emergency', 'consultation')),
-    status VARCHAR(50) NOT NULL DEFAULT 'pending_sync' CHECK (status IN ('booked_online', 'pending_sync', 'confirmed', 'cancelled', 'no_show')),
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    chair_number INT NOT NULL CHECK (chair_number BETWEEN 1 AND 4), -- Specifically restricted to 1-4 chairs
     start_time TIMESTAMPTZ NOT NULL,
     end_time TIMESTAMPTZ NOT NULL,
+    treatment_type VARCHAR(150) NOT NULL, -- e.g. Cleaning, Crown, Consultation
+    status VARCHAR(50) NOT NULL DEFAULT 'scheduled', -- scheduled, confirmed, completed, cancelled, no_show
+    source VARCHAR(50) NOT NULL DEFAULT 'office', -- office, self-booked (online widget)
     notes TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT chk_appointment_times CHECK (end_time > start_time)
+    
+    CONSTRAINT chk_appointment_times CHECK (start_time < end_time)
 );
 
--- Crucial indexes for rendering schedule grids (Range filters & joins)
-CREATE INDEX IF NOT EXISTS idx_appointments_clinic_time ON appointments(clinic_id, start_time DESC);
-CREATE INDEX IF NOT EXISTS idx_appointments_patient_id ON appointments(patient_id);
-CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
+-- Index foreign keys and common query paths
+CREATE INDEX idx_appointments_clinic_date ON appointments(clinic_id, start_time DESC);
+CREATE INDEX idx_appointments_patient ON appointments(patient_id);
+-- Exclusion constraint to prevent double-booking a chair at the same clinic
+CREATE INDEX idx_appointments_chair_overlap ON appointments(clinic_id, chair_number, start_time, end_time);
 
--- ============================================================================
--- 5. Table: pre_authorizations (Visual tracking Kanban)
--- ============================================================================
-CREATE TABLE IF NOT EXISTS pre_authorizations (
+-- 5. BOOKING SLOTS (For Online Self-Booking Widget)
+-- Dynamically managed availability slots based on clinic hours & chair availability
+CREATE TABLE booking_slots (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    chair_number INT NOT NULL CHECK (chair_number BETWEEN 1 AND 4),
+    start_time TIMESTAMPTZ NOT NULL,
+    end_time TIMESTAMPTZ NOT NULL,
+    is_reserved BOOLEAN NOT NULL DEFAULT FALSE,
+    reserved_until TIMESTAMPTZ, -- Temporary hold during checkout
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_booking_slots_lookup 
+ON booking_slots(clinic_id, start_time) 
+WHERE is_reserved = FALSE OR (is_reserved = TRUE AND reserved_until < NOW());
+
+-- 6. AUTOMATED SMS REMINDER STATUSES
+CREATE TABLE sms_reminders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    treatment_code VARCHAR(50) NOT NULL, -- e.g., D2740 (Crown) or D6010 (Implant)
-    treatment_description VARCHAR(255) NOT NULL,
-    insurance_carrier VARCHAR(150) NOT NULL,
-    estimated_cost_cents BIGINT NOT NULL DEFAULT 0, -- Stored in cents to avoid float rounding issues
-    approved_amount_cents BIGINT DEFAULT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'submitted' CHECK (status IN ('draft', 'submitted', 'aging_delay', 'action_required', 'approved', 'declined')),
-    reference_number VARCHAR(100),
-    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    last_checked_at TIMESTAMPTZ,
-    approved_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Indexes for Kanban dashboard tracking and aging alerts
-CREATE INDEX IF NOT EXISTS idx_pre_auth_clinic_status ON pre_authorizations(clinic_id, status);
-CREATE INDEX IF NOT EXISTS idx_pre_auth_patient_id ON pre_authorizations(patient_id);
-CREATE INDEX IF NOT EXISTS idx_pre_auth_aging ON pre_authorizations(submitted_at DESC) WHERE status = 'submitted';
-
--- ============================================================================
--- 6. Table: automated_recalls (Continuing Care Loops)
--- ============================================================================
-CREATE TABLE IF NOT EXISTS automated_recalls (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
-    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    recall_type VARCHAR(50) NOT NULL DEFAULT 'hygiene_6_month',
-    status VARCHAR(50) NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'sent', 'delivered', 'responded', 'failed', 'paused')),
-    scheduled_send_at TIMESTAMPTZ NOT NULL,
+    appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    type VARCHAR(50) NOT NULL, -- recall, 24h_reminder, 2h_immediate, booking_confirmation
+    status VARCHAR(50) NOT NULL DEFAULT 'pending', -- pending, queued, sent, delivered, failed
+    phone_number VARCHAR(20) NOT NULL,
+    message_body TEXT NOT NULL,
+    scheduled_for TIMESTAMPTZ NOT NULL,
     sent_at TIMESTAMPTZ,
-    booking_id UUID REFERENCES appointments(id) ON DELETE SET NULL, -- Connects recall success back to booking
+    external_provider_sid VARCHAR(255), -- Twilio / SMS provider reference
+    error_message TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Indexes for cron jobs querying matching send triggers
-CREATE INDEX IF NOT EXISTS idx_recalls_send_trigger ON automated_recalls(status, scheduled_send_at) WHERE status = 'scheduled';
-CREATE INDEX IF NOT EXISTS idx_recalls_patient_id ON automated_recalls(patient_id);
+-- Index for background cron/worker to find pending messages to send
+CREATE INDEX idx_sms_reminders_queue 
+ON sms_reminders(status, scheduled_for) 
+WHERE status = 'pending';
 
--- ============================================================================
--- Row Level Security (RLS) Setup for HIPAA Compliance
--- ============================================================================
+CREATE INDEX idx_sms_reminders_patient ON sms_reminders(patient_id);
 
-ALTER TABLE clinics ENABLE ROW LEVEL SECURITY;
-ALTER TABLE patients ENABLE ROW LEVEL SECURITY;
-ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pre_authorizations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE automated_recalls ENABLE ROW LEVEL SECURITY;
-ALTER TABLE beta_signups ENABLE ROW LEVEL SECURITY;
+-- 7. INSURANCE PRE-AUTHORIZATION TRACKER
+-- Specifically built to solve the "Sticky Note" problem for high-production cases
+CREATE TABLE pre_authorizations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    insurance_provider VARCHAR(150) NOT NULL,
+    policy_member_id VARCHAR(100) NOT NULL,
+    treatment_description VARCHAR(255) NOT NULL, -- e.g., "Crown for Tooth #14"
+    estimated_cost_cents BIGINT NOT NULL, -- Keep everything in cents to avoid decimal rounding errors
+    status VARCHAR(50) NOT NULL DEFAULT 'draft', -- draft, submitted, pending_info, approved, denied
+    submitted_at TIMESTAMPTZ,
+    responded_at TIMESTAMPTZ,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- Beta Signups: Anyone (anon) can insert signups; only authenticated staff can view
-CREATE POLICY signup_insert_policy ON beta_signups 
-    FOR INSERT WITH CHECK (true);
+-- Index for the visual Kanban Board (filtering by clinic & status)
+CREATE INDEX idx_pre_auths_kanban ON pre_authorizations(clinic_id, status, updated_at DESC);
 
-CREATE POLICY signup_select_policy ON beta_signups 
-    FOR SELECT TO authenticated USING (true);
+-- 8. TRIGGER FOR AUTO-UPDATED TIMESTAMPS
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Clinics & Clinical Tables: Lock access strictly to authenticated clinic tenants
-CREATE POLICY clinic_tenant_policy ON clinics 
-    FOR ALL TO authenticated USING (id = auth.uid());
-
-CREATE POLICY patients_tenant_policy ON patients 
-    FOR ALL TO authenticated USING (clinic_id = auth.uid());
-
-CREATE POLICY appointments_tenant_policy ON appointments 
-    FOR ALL TO authenticated USING (clinic_id = auth.uid());
-
-CREATE POLICY pre_auth_tenant_policy ON pre_authorizations 
-    FOR ALL TO authenticated USING (clinic_id = auth.uid());
-
-CREATE POLICY recalls_tenant_policy ON automated_recalls 
-    FOR ALL TO authenticated USING (clinic_id = auth.uid());
+-- Apply timestamp triggers
+CREATE TRIGGER update_clinics_modtime BEFORE UPDATE ON clinics FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+CREATE TRIGGER update_patients_modtime BEFORE UPDATE ON patients FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+CREATE TRIGGER update_appointments_modtime BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+CREATE TRIGGER update_sms_reminders_modtime BEFORE UPDATE ON sms_reminders FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+CREATE TRIGGER update_pre_authorizations_modtime BEFORE UPDATE ON pre_authorizations FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 
 COMMIT;
