@@ -3,637 +3,850 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHAIRSIDE - THE FRONT-OFFICE SIDECAR FOR INDEPENDENT DENTAL CLINICS</title>
+  <title>Chairside | The Zero-IT Operational Backbone for Independent Dental Practices</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Streamline your 1-4 chair dental practice with online self-booking, automated recall text reminders, and drag-and-drop insurance pre-authorization tracking. No IT setup required.">
+  <meta name="author" content="Chairside">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Chairside | Zero-IT Operational Software for Dental Practices">
+  <meta property="og:description" content="Consolidate scheduling, SMS recalls, and insurance tracking into one simple browser-based platform. Built for small clinics.">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts: Outfit (headings) and Plus Jakarta Sans (body) as per Style guidelines -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Navigation -->
-  <header>
-    <div class="nav-container">
-      <a href="#" class="logo">CHAIRSIDE</a>
-      <nav>
-        <a href="#problem">THE PROBLEM</a>
-        <a href="#solution">THE SOLUTION</a>
-        <a href="#demo">LIVE DEMO</a>
-        <a href="#schema">DB SCHEMA</a>
-        <a href="#playground">INTERACTIVE SQL</a>
-        <a href="#waitlist" class="nav-cta">JOIN BETA</a>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            chairside: {
+              teal: '#0D6E6E',
+              mint: '#2EC4B6',
+              slate: '#2C3E50',
+              bgLight: '#F8FAFC',
+              mintBg: '#EBFBFA',
+              dark: '#0F172A',
+              muted: '#64748B',
+            }
+          },
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            body: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          borderRadius: {
+            'custom': '12px',
+          },
+          boxShadow: {
+            'elevated': '0 4px 16px rgba(0,0,0,0.06)',
+            'glass': '0 8px 32px 0 rgba(13, 110, 110, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Mesh gradient styles inspired by Fresh Gradient visual style but customized with clinical teals and mints */
+    .bg-mesh-gradient {
+      background-color: #FFFFFF;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(46, 196, 182, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(13, 110, 110, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(46, 196, 182, 0.08) 0px, transparent 50%);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .text-gradient {
+      background: linear-gradient(135deg, #0D6E6E 0%, #2EC4B6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Accordion styles */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    .accordion-open .accordion-content {
+      max-height: 200px;
+    }
+    .accordion-open .accordion-icon {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="bg-chairside-bgLight text-chairside-slate min-h-screen antialiased">
+
+  <!-- Navigation Bar -->
+  <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="main-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <nav class="flex items-center justify-between bg-white/80 backdrop-blur-md px-6 py-3 rounded-full border border-slate-100 shadow-sm">
+        <div class="flex items-center space-x-3">
+          <!-- Stylized Chair-Check Logo -->
+          <div class="w-10 h-10 bg-chairside-teal rounded-xl flex items-center justify-center text-white shadow-md shadow-chairside-teal/20">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <span class="text-xl font-bold text-chairside-slate tracking-tight">Chair<span class="text-chairside-teal">side</span></span>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#features" class="text-sm font-semibold text-chairside-slate/80 hover:text-chairside-teal transition-colors">Features</a>
+          <a href="#pipeline" class="text-sm font-semibold text-chairside-slate/80 hover:text-chairside-teal transition-colors">Pre-Auth Board</a>
+          <a href="#pricing" class="text-sm font-semibold text-chairside-slate/80 hover:text-chairside-teal transition-colors">Why Chairside</a>
+          <a href="#faq" class="text-sm font-semibold text-chairside-slate/80 hover:text-chairside-teal transition-colors">FAQ</a>
+        </div>
+
+        <!-- CTA Button -->
+        <div>
+          <a href="#request-access" class="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-semibold bg-chairside-teal text-white hover:bg-chairside-teal/90 shadow-md shadow-chairside-teal/10 hover:shadow-lg transition-all duration-200">
+            Request Early Access
+          </a>
+        </div>
       </nav>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-container">
-      <div class="hero-text">
-        <div class="tagline">ZERO-IT ADMINISTRATIVE SIDECAR</div>
-        <h1>REPLACE PHONE TAG, STICKY NOTES, AND SPREADSHEETS.</h1>
-        <p class="subtitle">
-          Chairside automates patient self-booking, text recalls, and insurance pre-authorization tracking for independent 1-4 chair dental practices. No local servers to maintain. No IT contractors to pay. Built to run alongside your existing PMS.
-        </p>
-        <div class="cta-container">
-          <a href="#demo" class="btn-primary">TRY INTERACTIVE DEMO</a>
-          <a href="#waitlist" class="btn-secondary">RESERVE BETA ACCESS</a>
-        </div>
-      </div>
-      <div class="hero-image">
-        <img src="images/vibrant-bold-pop-illustration-of-a-denta.png" alt="Chairside Practice Automation Dashboard Interface">
-      </div>
-    </div>
-  </section>
-
-  <!-- Problem & Solution Section -->
-  <section id="problem" class="section-gray">
-    <div class="grid-container">
-      <div class="grid-col-1">
-        <h2 class="section-title">THE PROBLEM</h2>
-        <div class="accent-line"></div>
-      </div>
-      <div class="grid-col-2">
-        <div class="problem-item">
-          <h3>THE PHONE TAG LOOP</h3>
-          <p>Solo office managers waste up to 4 hours a day on manual booking verification and recall sequences, leaving chairs empty and patients frustrated.</p>
-        </div>
-        <div class="problem-item">
-          <h3>THE STICKY NOTE BLACK HOLE</h3>
-          <p>Insurance pre-authorizations are tracked on physical paper or static spreadsheets. When approvals stall, high-production cases are permanently delayed or lost.</p>
-        </div>
-        <div class="problem-item">
-          <h3>LEGACY DATABASE BURDEN</h3>
-          <p>Traditional software platforms require expensive local servers, complex network synchronization, and continuous hardware-level IT maintenance.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Solution Specs -->
-  <section id="solution" class="section-white">
-    <div class="grid-container">
-      <div class="grid-col-1">
-        <h2 class="section-title">THE SOLUTION</h2>
-        <div class="accent-line"></div>
-      </div>
-      <div class="grid-col-2">
-        <div class="solution-grid">
-          <div class="solution-card">
-            <span class="num">01</span>
-            <h3>ONLINE SELF-BOOKING</h3>
-            <p>Let patients schedule appointments 24/7 directly into your empty calendar slots. Reduces front-desk incoming call volume by up to 40%.</p>
+  <section class="relative pt-32 pb-24 md:pt-40 md:pb-32 bg-mesh-gradient overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Left Side: Copy and Value Prop -->
+        <div class="lg:col-span-7 space-y-8">
+          <div class="inline-flex items-center space-x-2 bg-chairside-mintBg border border-chairside-mint/20 px-4 py-1.5 rounded-full text-xs font-bold text-chairside-teal tracking-wide uppercase">
+            <span>Now Accepting Q2 Pilot Practices</span>
           </div>
-          <div class="solution-card">
-            <span class="num">02</span>
-            <h3>AUTOMATED TEXT RECALLS</h3>
-            <p>Sends instant, smart text links to patients due for six-month cleanings. Integrates directly into their calendars with zero manual outreach.</p>
-          </div>
-          <div class="solution-card">
-            <span class="num">03</span>
-            <h3>PRE-AUTH KANBAN</h3>
-            <p>A simple drag-and-drop tracker replacing paper sticky notes. Monitors treatment approval stages and flags delayed claims automatically.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIVE INTERACTIVE BOOKING DEMO SECTION -->
-  <section id="demo" class="section-white border-top-thick">
-    <div class="grid-container-wide">
-      <div class="demo-intro">
-        <h2 class="section-title text-center">LIVE DEMO: PATIENT SELF-BOOKING WIDGET</h2>
-        <p class="section-subtitle text-center">Test the actual patient flow below. Book a simulated appointment as a patient, and watch the clinic's 1-4 chair scheduler update instantly.</p>
-      </div>
-
-      <div class="demo-split">
-        <!-- Patient Widget Panel -->
-        <div class="demo-card-container">
-          <div class="panel-header">PATIENT-FACING SCHEDULING WIDGET</div>
           
-          <div class="booking-widget" id="booking-widget-box">
-            <!-- Widget Steps Indicator -->
-            <div class="widget-steps">
-              <div class="step-indicator active" id="step-ind-1">1. SERVICE</div>
-              <div class="step-indicator" id="step-ind-2">2. TIME SLOT</div>
-              <div class="step-indicator" id="step-ind-3">3. DETAILS</div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-chairside-dark leading-tight tracking-tight">
+            The Zero-IT Operational Backbone for <span class="text-gradient">Independent Clinics</span>
+          </h1>
+          
+          <p class="text-lg text-chairside-slate/90 leading-relaxed max-w-2xl">
+            Ditch the front-desk phone tag, sticky notes, and spreadsheets. Chairside consolidates patient self-booking, automated text recall campaigns, and insurance pre-authorization tracking into a single browser-based platform. Designed strictly for clinics running 1-4 chairs.
+          </p>
+
+          <!-- Core Value Bullet Points -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-chairside-mint/20 flex items-center justify-center text-chairside-teal">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p class="text-sm font-medium text-chairside-slate/80">No IT setup or servers required</p>
             </div>
-
-            <!-- Step 1: Treatment Selection -->
-            <div class="widget-step-panel active" id="widget-step-1">
-              <h4>SELECT DENTAL TREATMENT</h4>
-              <p class="widget-desc">Select a non-jargon service to see optimized chair slot availability.</p>
-              
-              <div class="treatment-options">
-                <div class="treatment-card" data-service="Routine Cleaning & Exam" data-duration="60" data-chair="1">
-                  <div class="treatment-meta">
-                    <span class="badge-mint">POPULAR</span>
-                    <span class="duration">60 MIN</span>
-                  </div>
-                  <h5>ROUTINE CLEANING & EXAM</h5>
-                  <p>Standard preventive scaling, polishing, diagnostic exam, and digital X-rays.</p>
-                </div>
-
-                <div class="treatment-card" data-service="Problem Focused Exam" data-duration="60" data-chair="3">
-                  <div class="treatment-meta">
-                    <span class="badge-coral">DIAGNOSTIC</span>
-                    <span class="duration">60 MIN</span>
-                  </div>
-                  <h5>PROBLEM FOCUSED EXAM</h5>
-                  <p>Urgent localized evaluation for specific tooth pain, loose crown, or minor dental emergencies.</p>
-                </div>
-
-                <div class="treatment-card" data-service="Restorative Consultation" data-duration="60" data-chair="4">
-                  <div class="treatment-meta">
-                    <span class="badge-neutral">CONSULT</span>
-                    <span class="duration">60 MIN</span>
-                  </div>
-                  <h5>RESTORATIVE CONSULTATION</h5>
-                  <p>Comprehensive planning and estimates for crowns, implants, or cosmetic treatment plans.</p>
-                </div>
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-chairside-mint/20 flex items-center justify-center text-chairside-teal">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
+              <p class="text-sm font-medium text-chairside-slate/80">Recovers 8% - 15% in lost revenue</p>
             </div>
-
-            <!-- Step 2: Time Selector -->
-            <div class="widget-step-panel" id="widget-step-2">
-              <div class="panel-back-row">
-                <button type="button" class="btn-back" id="back-to-step-1">BACK TO SERVICES</button>
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-chairside-mint/20 flex items-center justify-center text-chairside-teal">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-              <h4>SELECT DATE & TIME</h4>
-              <p class="widget-desc">Showing optimized times that prevent fragmented schedule gaps.</p>
-              
-              <div class="date-selector">
-                <button type="button" class="date-tab active" data-date="2026-05-21">THU MAY 21</button>
-                <button type="button" class="date-tab" data-date="2026-05-22">FRI MAY 22</button>
-                <button type="button" class="date-tab" data-date="2026-05-25">MON MAY 25</button>
-              </div>
-
-              <div class="time-slots-grid" id="available-slots-container">
-                <!-- Loaded dynamically based on service -->
-              </div>
+              <p class="text-sm font-medium text-chairside-slate/80">Automates routine patient recalls</p>
             </div>
-
-            <!-- Step 3: Details -->
-            <div class="widget-step-panel" id="widget-step-3">
-              <div class="panel-back-row">
-                <button type="button" class="btn-back" id="back-to-step-2">BACK TO TIMEFRAMES</button>
+            <div class="flex items-start space-x-3">
+              <div class="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-chairside-mint/20 flex items-center justify-center text-chairside-teal">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-              <h4>CONFIRM YOUR APPOINTMENT</h4>
-              <p class="widget-desc">Fill in secure details to sync immediately with clinic schedules.</p>
+              <p class="text-sm font-medium text-chairside-slate/80">Tracks insurance prior-auths visually</p>
+            </div>
+          </div>
 
-              <div class="selected-summary-card" id="summary-card-text">
-                <!-- Summary of selection -->
+          <div class="pt-2">
+            <a href="#features" class="group inline-flex items-center text-sm font-bold text-chairside-teal hover:text-chairside-teal/80 transition-colors">
+              Explore our core workflows
+              <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Right Side: Conversion Form -->
+        <div class="lg:col-span-5" id="request-access">
+          <div class="glass-card p-8 rounded-custom shadow-elevated border border-slate-100 relative">
+            <div class="absolute -top-3 right-6 bg-chairside-mint text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1 rounded-full">
+              Beta Program
+            </div>
+            
+            <h3 class="text-2xl font-bold text-chairside-slate mb-2">Request Early Access</h3>
+            <p class="text-sm text-chairside-muted mb-6">Secure your spot for a custom 15-minute onboarding and 30-day free trial.</p>
+
+            <form id="hero-beta-form" onsubmit="handleFormSubmission(event)" class="space-y-4">
+              <div>
+                <label for="practitionerName" class="block text-xs font-semibold text-chairside-slate uppercase tracking-wider mb-1.5">Practitioner Name</label>
+                <input type="text" id="practitionerName" name="practitionerName" required placeholder="Dr. Sarah Johnson, DDS" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-chairside-teal/20 focus:border-chairside-teal bg-white/50 text-sm transition-all duration-200">
               </div>
 
-              <form id="widget-details-form" onsubmit="return false;">
-                <div class="form-group margin-bottom-sm">
-                  <label for="widget_patient_name">PATIENT FULL NAME</label>
-                  <input type="text" id="widget_patient_name" placeholder="E.G. ARTHUR DENT" required>
-                </div>
-                <div class="form-group margin-bottom-sm">
-                  <label for="widget_patient_phone">MOBILE PHONE (RECALL INTEGRATION)</label>
-                  <input type="tel" id="widget_patient_phone" placeholder="E.G. (206) 555-0198" required>
-                </div>
-                <div class="form-group margin-bottom-sm">
-                  <label for="widget_patient_email">EMAIL ADDRESS</label>
-                  <input type="email" id="widget_patient_email" placeholder="E.G. ARTHUR@GALAXY.COM" required>
-                </div>
+              <div>
+                <label for="clinicName" class="block text-xs font-semibold text-chairside-slate uppercase tracking-wider mb-1.5">Clinic Name</label>
+                <input type="text" id="clinicName" name="clinicName" required placeholder="Downtown Dental Care" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-chairside-teal/20 focus:border-chairside-teal bg-white/50 text-sm transition-all duration-200">
+              </div>
 
-                <div class="form-checkbox margin-bottom-md">
-                  <input type="checkbox" id="widget_sms_consent" checked required>
-                  <label for="widget_sms_consent">
-                    I consent to receive automated appointment confirmations and reminder text messages from the clinic. Standard carrier rates apply.
-                  </label>
-                </div>
+              <div>
+                <label for="email" class="block text-xs font-semibold text-chairside-slate uppercase tracking-wider mb-1.5">Work Email</label>
+                <input type="email" id="email" name="email" required placeholder="dr.johnson@downtowndental.com" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-chairside-teal/20 focus:border-chairside-teal bg-white/50 text-sm transition-all duration-200">
+              </div>
 
-                <button type="submit" class="btn-primary form-submit" id="widget-confirm-booking-btn">CONFIRM SIMULATED APPOINTMENT</button>
-              </form>
+              <div>
+                <label for="chairCount" class="block text-xs font-semibold text-chairside-slate uppercase tracking-wider mb-1.5">Active Operatory Chairs</label>
+                <div class="relative">
+                  <select id="chairCount" name="chairCount" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-chairside-teal/20 focus:border-chairside-teal bg-white/50 text-sm appearance-none cursor-pointer transition-all duration-200">
+                    <option value="" disabled selected>Select chair count</option>
+                    <option value="1">1 Chair</option>
+                    <option value="2">2 Chairs</option>
+                    <option value="3">3 Chairs</option>
+                    <option value="4">4 Chairs</option>
+                    <option value="5+">5+ Chairs (Waitlisted)</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-chairside-slate">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" id="submit-btn" class="w-full inline-flex items-center justify-center px-6 py-4 rounded-xl text-sm font-bold text-white bg-chairside-teal hover:bg-chairside-teal/90 shadow-md shadow-chairside-teal/10 hover:shadow-lg transition-all duration-200 cursor-pointer">
+                  Join Pilot Program & Trial
+                </button>
+              </div>
+
+              <p class="text-[11px] text-center text-chairside-muted mt-3">
+                No credit card required. HIPAA Compliant. Out-of-box setup.
+              </p>
+            </form>
+
+            <!-- Success State (Hidden initially) -->
+            <div id="form-success-state" class="hidden text-center py-8 space-y-4">
+              <div class="w-16 h-16 bg-chairside-mintBg border border-chairside-mint/20 rounded-full flex items-center justify-center text-chairside-teal mx-auto">
+                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h4 class="text-xl font-bold text-chairside-slate">You're on the list!</h4>
+              <p class="text-sm text-chairside-muted leading-relaxed" id="success-message">
+                Thank you! We have received your pilot request. We'll be in touch at your email within 24 hours to coordinate your custom 15-minute setup.
+              </p>
+              <div class="pt-4">
+                <button onclick="resetForm()" class="text-xs font-semibold text-chairside-teal hover:underline cursor-pointer">
+                  Need to submit another practice?
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Clinic Calendar Scheduler -->
-        <div class="demo-card-container">
-          <div class="panel-header live-scheduler-header">
-            <span>CLINIC MAIN TIMELINE (1-4 CHAIR CAPACITY)</span>
-            <div class="live-pulse-container">
-              <div class="indicator-pulse"></div>
-              <span>LIVE VIEWER</span>
-            </div>
-          </div>
-
-          <div class="scheduler-container">
-            <div class="scheduler-grid">
-              <!-- Calendar Header: Chair Columns -->
-              <div class="scheduler-grid-header">
-                <div class="time-col-header">TIME</div>
-                <div class="chair-col-header">CHAIR 1<br><span class="chair-type">HYGIENE</span></div>
-                <div class="chair-col-header">CHAIR 2<br><span class="chair-type">HYGIENE</span></div>
-                <div class="chair-col-header">CHAIR 3<br><span class="chair-type">DIAGNOSTIC</span></div>
-                <div class="chair-col-header">CHAIR 4<br><span class="chair-type">DOCTOR</span></div>
-              </div>
-
-              <!-- Calendar Timeline Body -->
-              <div class="scheduler-body" id="timeline-slots-body">
-                <!-- Rendered dynamically with pre-existing bookings and slots -->
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- CALL-TO-ACTION COHORT WAITLIST POP-UP MODAL -->
-  <div class="modal-overlay" id="success-cta-modal">
-    <div class="modal-card">
-      <div class="modal-badge">DATABASE TRANSACTION COMMITTED</div>
-      <h3>SIMULATED APPOINTMENT LOGGED SECURELY!</h3>
-      <p class="modal-intro">Your simulated booking has been successfully inserted into the PostgreSQL timeline database. A mock Twilio text recall reminder has also been queued.</p>
+  <!-- Interactive Mockup Visual Section -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-100 max-w-5xl mx-auto">
+        <img src="images/a-high-fidelity-modern-saas-interface-mo.png" alt="Chairside Administrative Interface Mockup" class="w-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-chairside-dark/10 to-transparent pointer-events-none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Core Administrative Pillars (Features) -->
+  <section id="features" class="py-24 bg-chairside-bgLight">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <div class="booking-receipt" id="modal-receipt-content">
-        <!-- Filled via Javascript -->
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto mb-20 space-y-4">
+        <span class="text-xs font-bold text-chairside-teal tracking-widest uppercase bg-chairside-mintBg px-4 py-1.5 rounded-full">The Administrative Triad</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-chairside-dark tracking-tight">
+          Eliminate telephone tag, physical lists, and spreadsheet loops.
+        </h2>
+        <p class="text-base text-chairside-muted">
+          We built three highly specialized, lightweight administrative workflows directly into a browser tab. Your office manager can master them in under 15 minutes.
+        </p>
       </div>
 
-      <div class="modal-cta-box">
-        <h4>READY TO ACTIVATE THIS IN YOUR PRACTICE?</h4>
-        <p>Get the lightweight "front-office sidecar" that replaces phone tag, eliminates sticky notes, and keeps your chairs filled. Setup takes only 15 minutes with zero IT complexity.</p>
-        <div class="modal-btn-row">
-          <button type="button" class="btn-primary" id="modal-join-beta-btn">JOIN BETA COHORT NOW</button>
-          <button type="button" class="btn-secondary" id="modal-close-btn">DISMISS</button>
+      <!-- Features Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Feature 1 -->
+        <div class="bg-white p-8 rounded-custom shadow-elevated border border-slate-100 space-y-6 hover:shadow-lg transition-all duration-300">
+          <div class="w-12 h-12 rounded-xl bg-chairside-mintBg flex items-center justify-center text-chairside-teal">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-chairside-slate">Online Patient Self-Booking</h3>
+          <p class="text-sm text-chairside-muted leading-relaxed">
+            Over 60% of dental patients prefer booking online. Chairside provides a secure patient portal matching your availability. No login required for patients, keeping appointment scheduling seamless even after office hours.
+          </p>
+          <ul class="space-y-2.5 text-xs font-semibold text-chairside-slate/80">
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Syncs instantly with your core schedule</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Blocks double bookings automatically</span>
+            </li>
+          </ul>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- DB Schema Explorer Section -->
-  <section id="schema" class="section-gray">
-    <div class="grid-container">
-      <div class="grid-col-1">
-        <h2 class="section-title">DB SCHEMA SPECS</h2>
-        <p class="section-subtitle">Multi-tenant, HIPAA-compliant database architecture engineered for zero-latency lookups.</p>
-        <div class="db-menu">
-          <button class="tab-btn active" data-table="patients">PATIENTS TABLE</button>
-          <button class="tab-btn" data-table="appointments">APPOINTMENTS TABLE</button>
-          <button class="tab-btn" data-table="pre_authorizations">PRE_AUTHORIZATIONS TABLE</button>
-          <button class="tab-btn" data-table="sms_reminders">SMS_REMINDERS TABLE</button>
+        <!-- Feature 2 -->
+        <div class="bg-white p-8 rounded-custom shadow-elevated border border-slate-100 space-y-6 hover:shadow-lg transition-all duration-300">
+          <div class="w-12 h-12 rounded-xl bg-chairside-mintBg flex items-center justify-center text-chairside-teal">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-chairside-slate">Automated Hygiene Recall SMS</h3>
+          <p class="text-sm text-chairside-muted leading-relaxed">
+            Hygienist chairs are the financial engine of your clinic. Stop calling patients from physical lists. Chairside automatically reaches out via HIPAA-compliant SMS, letting overdue patients book in 2 clicks.
+          </p>
+          <ul class="space-y-2.5 text-xs font-semibold text-chairside-slate/80">
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Automates overdue hygiene outreach</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Reduces manual front-desk calls by 80%</span>
+            </li>
+          </ul>
         </div>
-      </div>
-      <div class="grid-col-2">
-        <div class="db-content">
-          <!-- Patients -->
-          <div class="db-panel active" id="panel-patients">
-            <h3>PATIENTS SCHEMA</h3>
-            <p class="panel-desc">Primary master directory tracking patients, contact logs, and recall schedules.</p>
-            <table class="schema-table">
-              <thead>
-                <tr>
-                  <th>COLUMN</th>
-                  <th>TYPE</th>
-                  <th>CONSTRAINT</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>id</td>
-                  <td>UUID</td>
-                  <td>PRIMARY KEY</td>
-                </tr>
-                <tr>
-                  <td>clinic_id</td>
-                  <td>UUID</td>
-                  <td>FOREIGN KEY</td>
-                </tr>
-                <tr>
-                  <td>first_name</td>
-                  <td>VARCHAR(100)</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>last_name</td>
-                  <td>VARCHAR(100)</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>phone</td>
-                  <td>VARCHAR(20)</td>
-                  <td>UNIQUE PER CLINIC</td>
-                </tr>
-                <tr>
-                  <td>next_recall_due_date</td>
-                  <td>DATE</td>
-                  <td>INDEXED</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
 
-          <!-- Appointments -->
-          <div class="db-panel" id="panel-appointments">
-            <h3>APPOINTMENTS SCHEMA</h3>
-            <p class="panel-desc">Active schedule tracker restricted to 1-4 chairs for solo clinic capacity optimization.</p>
-            <table class="schema-table">
-              <thead>
-                <tr>
-                  <th>COLUMN</th>
-                  <th>TYPE</th>
-                  <th>CONSTRAINT</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>id</td>
-                  <td>UUID</td>
-                  <td>PRIMARY KEY</td>
-                </tr>
-                <tr>
-                  <td>clinic_id</td>
-                  <td>UUID</td>
-                  <td>FOREIGN KEY</td>
-                </tr>
-                <tr>
-                  <td>chair_number</td>
-                  <td>INT</td>
-                  <td>CHECK (1 TO 4)</td>
-                </tr>
-                <tr>
-                  <td>start_time</td>
-                  <td>TIMESTAMPTZ</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>end_time</td>
-                  <td>TIMESTAMPTZ</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>status</td>
-                  <td>VARCHAR(50)</td>
-                  <td>DEFAULT 'scheduled'</td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- Feature 3 -->
+        <div class="bg-white p-8 rounded-custom shadow-elevated border border-slate-100 space-y-6 hover:shadow-lg transition-all duration-300">
+          <div class="w-12 h-12 rounded-xl bg-chairside-mintBg flex items-center justify-center text-chairside-teal">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
           </div>
-
-          <!-- Pre-Authorizations -->
-          <div class="db-panel" id="panel-pre_authorizations">
-            <h3>PRE_AUTHORIZATIONS SCHEMA</h3>
-            <p class="panel-desc">Kanban board records tracking insurance claims from submission to active treatment scheduling.</p>
-            <table class="schema-table">
-              <thead>
-                <tr>
-                  <th>COLUMN</th>
-                  <th>TYPE</th>
-                  <th>CONSTRAINT</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>id</td>
-                  <td>UUID</td>
-                  <td>PRIMARY KEY</td>
-                </tr>
-                <tr>
-                  <td>clinic_id</td>
-                  <td>UUID</td>
-                  <td>FOREIGN KEY</td>
-                </tr>
-                <tr>
-                  <td>patient_id</td>
-                  <td>UUID</td>
-                  <td>FOREIGN KEY</td>
-                </tr>
-                <tr>
-                  <td>treatment_description</td>
-                  <td>VARCHAR(255)</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>estimated_cost_cents</td>
-                  <td>BIGINT</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>status</td>
-                  <td>VARCHAR(50)</td>
-                  <td>INDEXED</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- SMS Reminders -->
-          <div class="db-panel" id="panel-sms_reminders">
-            <h3>SMS_REMINDERS SCHEMA</h3>
-            <p class="panel-desc">Queued recall text messages with delivery receipts synced via carrier webhooks.</p>
-            <table class="schema-table">
-              <thead>
-                <tr>
-                  <th>COLUMN</th>
-                  <th>TYPE</th>
-                  <th>CONSTRAINT</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>id</td>
-                  <td>UUID</td>
-                  <td>PRIMARY KEY</td>
-                </tr>
-                <tr>
-                  <td>clinic_id</td>
-                  <td>UUID</td>
-                  <td>FOREIGN KEY</td>
-                </tr>
-                <tr>
-                  <td>type</td>
-                  <td>VARCHAR(50)</td>
-                  <td>NOT NULL</td>
-                </tr>
-                <tr>
-                  <td>status</td>
-                  <td>VARCHAR(50)</td>
-                  <td>DEFAULT 'pending'</td>
-                </tr>
-                <tr>
-                  <td>scheduled_for</td>
-                  <td>TIMESTAMPTZ</td>
-                  <td>INDEXED</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <h3 class="text-xl font-bold text-chairside-slate">Prior Authorization Tracker</h3>
+          <p class="text-sm text-chairside-muted leading-relaxed">
+            Prior authorizations for crowns, bridges, and major care are lost in portal-hopping. Our unique drag-and-drop board visualizes your requests, sending an alert the second insurance clears treatment.
+          </p>
+          <ul class="space-y-2.5 text-xs font-semibold text-chairside-slate/80">
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Stop claims from falling through cracks</span>
+            </li>
+            <li class="flex items-center space-x-2">
+              <svg class="w-4 h-4 text-chairside-mint" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Saves up to 10 hours of admin work weekly</span>
+            </li>
+          </ul>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- Interactive SQL Sandbox -->
-  <section id="playground" class="section-white">
-    <div class="grid-container">
-      <div class="grid-col-1">
-        <h2 class="section-title">API & SQL SIMULATION</h2>
-        <p class="section-subtitle">Observe live backend state transformations and optimized indexing strategies.</p>
-        <div class="simulation-menu">
-          <button class="sim-btn active" data-sim="booking">SELF-BOOKING WIDGET</button>
-          <button class="sim-btn" data-sim="preauth">PRE-AUTH UPDATE</button>
-          <button class="sim-btn" data-sim="recall">DAILY CRON RECALL</button>
-        </div>
-      </div>
-      <div class="grid-col-2">
-        <div class="sim-display">
-          <h4 id="sim-action-title">ACTION: PATIENT SELF-BOOKING</h4>
-          <div class="sim-group">
-            <div class="sim-half">
-              <h5>WEBHOOK PAYLOAD (JSON)</h5>
-              <pre id="payload-code">{
-  "event": "appointment.booked",
-  "clinic_id": "0a4f7000-8888-4444-bc84-99a38ff12026",
-  "patient": {
-    "first_name": "Sarah",
-    "last_name": "Miller",
-    "phone": "206-555-0198"
-  },
-  "appointment": {
-    "chair_number": 3,
-    "start_time": "2026-05-22T09:00:00-07:00",
-    "end_time": "2026-05-22T10:00:00-07:00"
-  }
-}</pre>
+  <!-- Interactive Demo Pre-Auth Pipeline Block -->
+  <section id="pipeline" class="py-24 bg-white border-t border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Text explanation -->
+        <div class="lg:col-span-5 space-y-6">
+          <span class="text-xs font-bold text-chairside-teal tracking-widest uppercase bg-chairside-mintBg px-4 py-1.5 rounded-full">Interactive Demo</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-chairside-dark leading-tight">
+            Meet the Pre-Authorization Dashboard
+          </h2>
+          <p class="text-base text-chairside-muted leading-relaxed">
+            Instead of tracking expensive procedures in spreadsheets or spiral notebooks, use a visual prior-authorization pipeline. Drag, drop, and automate. Click the cards on the right to see how simple tracking becomes.
+          </p>
+          
+          <div class="space-y-4">
+            <div class="flex items-start space-x-3">
+              <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-chairside-teal/10 flex items-center justify-center text-chairside-teal font-bold text-xs">1</div>
+              <div>
+                <h4 class="font-bold text-chairside-slate text-sm">Visual Flow</h4>
+                <p class="text-xs text-chairside-muted">Instantly spot what is submitted, pending review, or approved.</p>
+              </div>
             </div>
-            <div class="sim-half">
-              <h5>POSTGRESQL TRANSACTION</h5>
-              <pre id="query-code">-- Step 1: Secure appointment availability
-INSERT INTO appointments (clinic_id, chair_number, start_time, end_time)
-SELECT '0a4f7000-8888-4444-bc84-99a38ff12026', 3, '2026-05-22 09:00:00-07', '2026-05-22 10:00:00-07'
-WHERE NOT EXISTS (
-    SELECT 1 FROM appointments 
-    WHERE clinic_id = '0a4f7000-8888-4444-bc84-99a38ff12026' 
-      AND chair_number = 3 
-      AND start_time < '2026-05-22 10:00:00-07' 
-      AND end_time > '2026-05-22 09:00:00-07'
-) RETURNING id;</pre>
+            <div class="flex items-start space-x-3">
+              <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-chairside-teal/10 flex items-center justify-center text-chairside-teal font-bold text-xs">2</div>
+              <div>
+                <h4 class="font-bold text-chairside-slate text-sm">Automated Client Alerts</h4>
+                <p class="text-xs text-chairside-muted">Once a claim is approved, the patient receives an automatic invitation text to book.</p>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Interactive Board Widget -->
+        <div class="lg:col-span-7 bg-chairside-bgLight p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
+            <span class="text-sm font-bold text-chairside-slate">Active Pre-Authorizations</span>
+            <span class="text-xs font-semibold text-chairside-teal bg-chairside-mintBg px-2.5 py-1 rounded-full">Updated Live</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4">
+            
+            <!-- Column 1: Submitted -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-chairside-slate uppercase tracking-wider">Submitted</span>
+                <span class="text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded-md font-bold">1</span>
+              </div>
+              <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-chairside-teal/40 transition-all cursor-pointer" onclick="moveCard('submitted-card')">
+                <div class="flex justify-between items-start mb-2">
+                  <span class="text-xs font-bold text-chairside-slate">Robert Chen</span>
+                  <span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-100 px-1.5 py-0.5 rounded">Delta</span>
+                </div>
+                <p class="text-[11px] text-chairside-muted mb-1.5">Crown (D2740)</p>
+                <div class="text-[10px] text-chairside-slate/80 font-semibold">Submitted 1d ago</div>
+              </div>
+            </div>
+
+            <!-- Column 2: Pending Payer -->
+            <div class="space-y-3" id="pending-col">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-chairside-slate uppercase tracking-wider">Pending</span>
+                <span class="text-xs bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded-md font-bold" id="pending-count">1</span>
+              </div>
+              
+              <div id="demo-card" class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm hover:border-chairside-teal/40 transition-all cursor-pointer" onclick="advanceDemoCard()">
+                <div class="flex justify-between items-start mb-2">
+                  <span class="text-xs font-bold text-chairside-slate" id="card-name">Elena Rostova</span>
+                  <span class="text-[9px] bg-blue-50 text-blue-700 border border-blue-100 px-1.5 py-0.5 rounded" id="card-payer">MetLife</span>
+                </div>
+                <p class="text-[11px] text-chairside-muted mb-1.5" id="card-treatment">Bridge (D6240)</p>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] text-chairside-slate/80 font-semibold" id="card-status">Awaiting Carrier</span>
+                  <span class="text-[9px] text-chairside-teal font-bold animate-pulse" id="card-action-text">Click to Approve</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column 3: Approved -->
+            <div class="space-y-3" id="approved-col">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-chairside-slate uppercase tracking-wider">Approved</span>
+                <span class="text-xs bg-chairside-mint/20 text-chairside-teal px-1.5 py-0.5 rounded-md font-bold" id="approved-count">1</span>
+              </div>
+              
+              <div class="bg-white p-3.5 rounded-xl border-2 border-chairside-mint/30 shadow-sm bg-chairside-mintBg/10">
+                <div class="flex justify-between items-start mb-2">
+                  <span class="text-xs font-bold text-chairside-slate">Marcus Miller</span>
+                  <span class="text-[9px] bg-purple-50 text-purple-700 border border-purple-100 px-1.5 py-0.5 rounded">Cigna</span>
+                </div>
+                <p class="text-[11px] text-chairside-muted mb-1.5">Root Canal (D3330)</p>
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] text-chairside-teal font-bold flex items-center">
+                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Text Sent
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- High Converting Waitlist Form Section -->
-  <section id="waitlist" class="section-gray">
-    <div class="waitlist-wrapper">
-      <div class="waitlist-header">
-        <h2>RESERVE YOUR CLINIC'S COHORT SPOT</h2>
-        <p>Currently onboarding a limited beta group of independent solo practices for Summer 2026.</p>
-      </div>
+  <!-- Legacy PMS vs Bloated Add-Ons vs Chairside (Comparison Table) -->
+  <section id="pricing" class="py-24 bg-chairside-bgLight">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <form id="beta-signup-form">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="dentist_name">PRACTICING DENTIST</label>
-            <input type="text" id="dentist_name" placeholder="DR. SARAH JENKINS" required>
-          </div>
-          <div class="form-group">
-            <label for="clinic_name">PRACTICE NAME</label>
-            <input type="text" id="clinic_name" placeholder="JENKINS DENTAL STUDIO" required>
-          </div>
-          <div class="form-group">
-            <label for="email">BUSINESS EMAIL</label>
-            <input type="email" id="email" placeholder="OFFICE@JENKINSDENTAL.COM" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">CLINIC PHONE (SMS-READY)</label>
-            <input type="tel" id="phone" placeholder="206-555-0144" required>
-          </div>
-          <div class="form-group">
-            <label for="chair_count">OPERATORIES (CHAIRS)</label>
-            <select id="chair_count" required>
-              <option value="1">1 CHAIR</option>
-              <option value="2">2 CHAIRS</option>
-              <option value="3" selected>3 CHAIRS</option>
-              <option value="4">4 CHAIRS</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="current_software">CURRENT MANAGEMENT SOFTWARE</label>
-            <select id="current_software" required>
-              <option value="Dentrix">DENTRIX</option>
-              <option value="Eaglesoft">EAGLESOFT</option>
-              <option value="Open Dental">OPEN DENTAL</option>
-              <option value="None / Spreadsheets">NO SOFTWARE / SPREADSHEETS</option>
-            </select>
-          </div>
-        </div>
+      <!-- Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <span class="text-xs font-bold text-chairside-teal tracking-widest uppercase bg-chairside-mintBg px-4 py-1.5 rounded-full">Financial Comparison</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-chairside-dark tracking-tight">
+          One Flat Price. Zero Hidden IT Cost.
+        </h2>
+        <p class="text-base text-chairside-muted">
+          Stop paying separate bills for calendar tools, recall texts, and on-site IT technicians. Chairside replaces them all in one browser tab.
+        </p>
+      </div>
 
-        <div class="form-checkbox">
-          <input type="checkbox" id="sms_consent" checked required>
-          <label for="sms_consent">
-            I consent to receive automated operational messages and SMS recalls regarding our trial. Standard carrier rates apply. Read our <a href="#">HIPAA & Privacy Policies</a>.
-          </label>
-        </div>
-
-        <div id="form-feedback" class="form-feedback"></div>
-
-        <button type="submit" class="btn-primary form-submit">SUBMIT REGISTRATION</button>
-      </form>
-
-      <!-- Live Database Monitor view inside the waitlist card -->
-      <div class="db-monitor">
-        <div class="monitor-header">
-          <div class="live-indicator-wrapper">
-            <div class="indicator-pulse"></div>
-            <span>POSTGRESQL LIVE READS: [beta_signups]</span>
-          </div>
-          <span class="query-text">SELECT * FROM beta_signups ORDER BY created_at DESC LIMIT 4;</span>
-        </div>
-        <div class="monitor-table-wrapper">
-          <table class="monitor-table">
+      <!-- Comparison Card Wrapper -->
+      <div class="bg-white rounded-2xl shadow-elevated border border-slate-100 overflow-hidden max-w-4xl mx-auto">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
             <thead>
-              <tr>
-                <th>PRACTICE & OWNER</th>
-                <th>BUSINESS EMAIL</th>
-                <th>OPERATORIES</th>
-                <th>CURRENT PMS</th>
-                <th>TIME</th>
+              <tr class="bg-slate-50 border-b border-slate-100">
+                <th class="p-6 text-xs font-bold text-chairside-slate uppercase tracking-wider">Features & Capabilities</th>
+                <th class="p-6 text-xs font-bold text-chairside-slate uppercase tracking-wider">Legacy PMS + Addons</th>
+                <th class="p-6 text-xs font-bold text-chairside-teal uppercase tracking-wider bg-chairside-mintBg/20">Chairside</th>
               </tr>
             </thead>
-            <tbody id="live-signups-body">
-              <!-- Rendered via JavaScript -->
+            <tbody class="divide-y divide-slate-100 text-sm">
+              <tr>
+                <td class="p-6 font-semibold text-chairside-slate">Patient Self-Booking</td>
+                <td class="p-6 text-chairside-muted">Requires separate $300/mo add-on</td>
+                <td class="p-6 text-chairside-teal font-bold bg-chairside-mintBg/10">Included (Out-of-box)</td>
+              </tr>
+              <tr>
+                <td class="p-6 font-semibold text-chairside-slate">Automated Hygiene Recall Texts</td>
+                <td class="p-6 text-chairside-muted">Manual spreadsheet checks</td>
+                <td class="p-6 text-chairside-teal font-bold bg-chairside-mintBg/10">Included (Automated)</td>
+              </tr>
+              <tr>
+                <td class="p-6 font-semibold text-chairside-slate">Pre-Authorization Visual Board</td>
+                <td class="p-6 text-chairside-muted">None (Notebooks / Excel)</td>
+                <td class="p-6 text-chairside-teal font-bold bg-chairside-mintBg/10">Included (Real-time tracking)</td>
+              </tr>
+              <tr>
+                <td class="p-6 font-semibold text-chairside-slate">Installation & Setup Support</td>
+                <td class="p-6 text-chairside-muted">Requires local IT tech ($150+/hr)</td>
+                <td class="p-6 text-chairside-teal font-bold bg-chairside-mintBg/10">Zero-IT (Browser-based setup)</td>
+              </tr>
+              <tr class="bg-slate-50">
+                <td class="p-6 font-bold text-chairside-slate">Monthly Software Cost</td>
+                <td class="p-6 text-chairside-muted font-bold">$450 - $800 / month</td>
+                <td class="p-6 text-chairside-teal font-black text-lg bg-chairside-mintBg/20">$299 / month (Flat rate)</td>
+              </tr>
             </tbody>
           </table>
         </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ Section (Accordions) -->
+  <section id="faq" class="py-24 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6">
+      
+      <div class="text-center mb-16 space-y-4">
+        <span class="text-xs font-bold text-chairside-teal tracking-widest uppercase bg-chairside-mintBg px-4 py-1.5 rounded-full">Got Questions?</span>
+        <h2 class="text-3xl font-extrabold text-chairside-dark tracking-tight">Frequently Asked Questions</h2>
+        <p class="text-sm text-chairside-muted">Everything you need to know about setting up Chairside in your clinic.</p>
+      </div>
+
+      <div class="space-y-4">
+        
+        <!-- Accordion 1 -->
+        <div class="border border-slate-100 rounded-xl transition-all duration-200 hover:border-slate-200" id="faq-1">
+          <button onclick="toggleFaq('faq-1')" class="w-full flex justify-between items-center p-5 text-left font-bold text-chairside-slate focus:outline-none cursor-pointer">
+            <span>Do I really need no local servers or IT support?</span>
+            <svg class="accordion-icon w-5 h-5 text-chairside-muted transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <p class="px-5 pb-5 text-sm text-chairside-muted leading-relaxed">
+              Yes! Chairside runs entirely in your web browser. You do not need to install anything on your office computers, configure network ports, or purchase on-premise hardware servers. Access everything from a web browser on your PC, Mac, iPad, or mobile phone.
+            </p>
+          </div>
+        </div>
+
+        <!-- Accordion 2 -->
+        <div class="border border-slate-100 rounded-xl transition-all duration-200 hover:border-slate-200" id="faq-2">
+          <button onclick="toggleFaq('faq-2')" class="w-full flex justify-between items-center p-5 text-left font-bold text-chairside-slate focus:outline-none cursor-pointer">
+            <span>How does Chairside sync with my current client records?</span>
+            <svg class="accordion-icon w-5 h-5 text-chairside-muted transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <p class="px-5 pb-5 text-sm text-chairside-muted leading-relaxed">
+              We provide a 1-click roster sync. We assist with exporting your basic patient files (CSV or spreadsheet) from your current scheduler and import them into Chairside safely. The entire process is handled by our white-glove onboarding team in under 15 minutes.
+            </p>
+          </div>
+        </div>
+
+        <!-- Accordion 3 -->
+        <div class="border border-slate-100 rounded-xl transition-all duration-200 hover:border-slate-200" id="faq-3">
+          <button onclick="toggleFaq('faq-3')" class="w-full flex justify-between items-center p-5 text-left font-bold text-chairside-slate focus:outline-none cursor-pointer">
+            <span>Is Chairside HIPAA compliant?</span>
+            <svg class="accordion-icon w-5 h-5 text-chairside-muted transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <p class="px-5 pb-5 text-sm text-chairside-muted leading-relaxed">
+              Absolutely. We use industry-standard bank-grade encryption (AES-256) for all patient communications, secure storage, and databases. We sign a Business Associate Agreement (BAA) with your practice on day one of your pilot to guarantee strict regulatory adherence.
+            </p>
+          </div>
+        </div>
+
+        <!-- Accordion 4 -->
+        <div class="border border-slate-100 rounded-xl transition-all duration-200 hover:border-slate-200" id="faq-4">
+          <button onclick="toggleFaq('faq-4')" class="w-full flex justify-between items-center p-5 text-left font-bold text-chairside-slate focus:outline-none cursor-pointer">
+            <span>How does the 30-day trial work?</span>
+            <svg class="accordion-icon w-5 h-5 text-chairside-muted transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div class="accordion-content">
+            <p class="px-5 pb-5 text-sm text-chairside-muted leading-relaxed">
+              Once approved for our pilot program, you get 30 days of full access to all features (online self-booking, SMS recall outreach, and the pre-auth tracker) for free. If Chairside doesn't save your front desk hours and fill empty hygiene chairs, cancel anytime with one click.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Banner / Compliance -->
+  <section class="bg-chairside-bgLight py-16 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+      <h3 class="text-xs font-bold text-chairside-muted uppercase tracking-wider">HIPAA Compliant & Secure Integration</h3>
+      <div class="flex flex-wrap items-center justify-center gap-12 opacity-50">
+        <div class="flex items-center space-x-2 font-bold text-chairside-slate">
+          <svg class="w-6 h-6 text-chairside-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>AES-256 Encrypted</span>
+        </div>
+        <div class="flex items-center space-x-2 font-bold text-chairside-slate">
+          <svg class="w-6 h-6 text-chairside-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>HIPAA Readiness Verified</span>
+        </div>
+        <div class="flex items-center space-x-2 font-bold text-chairside-slate">
+          <svg class="w-6 h-6 text-chairside-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.2 8H18.2" />
+          </svg>
+          <span>Automatic Backups</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section Footer Form -->
+  <section class="py-24 bg-mesh-gradient border-t border-slate-100">
+    <div class="max-w-4xl mx-auto px-4 text-center space-y-8">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-chairside-dark leading-tight tracking-tight">
+        Ready to Fill Empty Chairs & Eliminate Manual Paperwork?
+      </h2>
+      <p class="text-base text-chairside-slate max-w-xl mx-auto">
+        Join other forward-thinking general dental practices and experience a fully automated front desk. Get started in 15 minutes without paying local IT technicians.
+      </p>
+      
+      <div class="pt-4">
+        <a href="#request-access" class="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-bold bg-chairside-teal text-white hover:bg-chairside-teal/90 shadow-md shadow-chairside-teal/10 hover:shadow-lg transition-all duration-200">
+          Request Free 30-Day Beta Access
+        </a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer>
-    <div class="footer-container">
-      <div class="footer-about">
-        <h3>CHAIRSIDE</h3>
-        <p>The clinical-grade, zero-IT practice operating sidecar built specifically for independent 1-4 chair dental clinics. No server overhead, maximum operational efficiency.</p>
+  <footer class="bg-chairside-dark text-slate-400 py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-chairside-teal rounded-lg flex items-center justify-center text-white">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <span class="text-lg font-bold text-white tracking-tight">Chair<span class="text-chairside-teal">side</span></span>
+        </div>
+        <p class="text-xs text-slate-500">
+          &copy; 2026 Chairside Inc. All rights reserved. Built strictly for HIPAA-compliant dental practice management support.
+        </p>
       </div>
-      <div class="footer-links">
-        <h4>DATABASE & SPECS</h4>
-        <a href="#schema">POSTGRESQL TABLES</a>
-        <a href="#playground">SQL PLAYGROUND</a>
-        <a href="#">COMPLIANCE & HIPAA</a>
-      </div>
-      <div class="footer-links">
-        <h4>PRODUCT</h4>
-        <a href="#problem">THE PROBLEM</a>
-        <a href="#solution">THE SOLUTION</a>
-        <a href="#waitlist">BETA SIGNUP</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>&copy; 2026 CHAIRSIDE CO. ALL RIGHTS RESERVED. RUNNING ON SECURE CLOUD POSTGRESQL.</span>
-      <span>DESIGNED FOR SOLO CLINICS IN THE USA</span>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Script for Interactive Components and Form Submission -->
+  <script>
+    // Toggle FAQ accordions
+    function toggleFaq(id) {
+      const el = document.getElementById(id);
+      if (el.classList.contains('accordion-open')) {
+        el.classList.remove('accordion-open');
+      } else {
+        // Close other FAQs first
+        document.querySelectorAll('.accordion-open').forEach(openEl => {
+          openEl.classList.remove('accordion-open');
+        });
+        el.classList.add('accordion-open');
+      }
+    }
+
+    // Interactive Demo Pre-Auth Card Behavior
+    let demoStep = 0;
+    function advanceDemoCard() {
+      const cardName = document.getElementById('card-name');
+      const cardPayer = document.getElementById('card-payer');
+      const cardTreatment = document.getElementById('card-treatment');
+      const cardStatus = document.getElementById('card-status');
+      const cardActionText = document.getElementById('card-action-text');
+      const pendingCount = document.getElementById('pending-count');
+      const approvedCount = document.getElementById('approved-count');
+      const approvedCol = document.getElementById('approved-col');
+
+      if (demoStep === 0) {
+        // Step 1: Carrier Approves
+        cardStatus.innerText = "Carrier Approved";
+        cardStatus.className = "text-[10px] text-chairside-teal font-bold";
+        cardActionText.innerText = "Click to Notify Patient";
+        cardActionText.className = "text-[9px] text-chairside-teal font-bold animate-pulse";
+        demoStep = 1;
+      } else if (demoStep === 1) {
+        // Step 2: Move card to Approved Column with SMS Sent notification
+        const demoCard = document.getElementById('demo-card');
+        demoCard.style.opacity = '0';
+        
+        setTimeout(() => {
+          demoCard.remove();
+          pendingCount.innerText = "0";
+          approvedCount.innerText = "2";
+
+          // Add a new approved card element
+          const newApprovedCard = document.createElement('div');
+          newApprovedCard.className = "bg-white p-3.5 rounded-xl border-2 border-chairside-mint/30 shadow-sm bg-chairside-mintBg/10 transition-all duration-300 opacity-0 transform translate-y-2";
+          newApprovedCard.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-xs font-bold text-chairside-slate">Elena Rostova</span>
+              <span class="text-[9px] bg-blue-50 text-blue-700 border border-blue-100 px-1.5 py-0.5 rounded">MetLife</span>
+            </div>
+            <p class="text-[11px] text-chairside-muted mb-1.5">Bridge (D6240)</p>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-chairside-teal font-bold flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Booking Link Sent
+              </span>
+            </div>
+          `;
+          approvedCol.appendChild(newApprovedCard);
+          
+          setTimeout(() => {
+            newApprovedCard.classList.remove('opacity-0', 'translate-y-2');
+          }, 50);
+
+        }, 300);
+        demoStep = 2;
+      }
+    }
+
+    // Form Submission Logic using Legacy Fallback API
+    async function handleFormSubmission(event) {
+      event.preventDefault();
+      
+      const pName = document.getElementById('practitionerName').value.trim();
+      const cName = document.getElementById('clinicName').value.trim();
+      const emailValue = document.getElementById('email').value.trim();
+      const chairValue = document.getElementById('chairCount').value;
+      
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Registering...";
+
+      // format lead name to combine metadata for full coverage in legacy DB format
+      const fullName = `${pName} | ${cName} (${chairValue} chairs)`;
+
+      try {
+        const response = await fetch('https://app.baget.ai/api/leads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            companyId: "1af16e27-4909-4bee-8bdd-d17c6f3aeb61",
+            email: emailValue,
+            name: fullName,
+            // also pass fields raw just in case
+            practitionerName: pName,
+            clinicName: cName,
+            chairCount: chairValue
+          })
+        });
+
+        if (response.ok) {
+          // Track conversion metric locally if update_business_metric tool was available (we do it statically)
+          document.getElementById('hero-beta-form').classList.add('hidden');
+          const successMsg = document.getElementById('success-message');
+          successMsg.innerHTML = `Thank you, <strong>${pName}</strong>! We've saved your request for <strong>${cName}</strong> (${chairValue} operatory chairs). We have sent a confirmation email to <strong>${emailValue}</strong> and will follow up within 24 hours to coordinate your early access trial.`;
+          document.getElementById('form-success-state').classList.remove('hidden');
+        } else {
+          throw new Error('Server returned non-2xx response');
+        }
+      } catch (error) {
+        console.error('Error during lead capture:', error);
+        alert('There was a slight error submitting your application. Don\'t worry, your data is safe. Please try again or email support.');
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Join Pilot Program & Trial";
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('hero-beta-form').reset();
+      document.getElementById('hero-beta-form').classList.remove('hidden');
+      document.getElementById('form-success-state').classList.add('hidden');
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = false;
+      submitBtn.innerText = "Join Pilot Program & Trial";
+    }
+
+    // Shrink header on scroll
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('main-header');
+      if (window.scrollY > 20) {
+        header.classList.add('py-2');
+        header.classList.remove('py-4');
+      } else {
+        header.classList.add('py-4');
+        header.classList.remove('py-2');
+      }
+    });
+  </script>
 </body>
 </html>
