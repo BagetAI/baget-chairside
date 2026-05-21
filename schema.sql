@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "citext";
 
 -- 2. CLINICS (TENANTS)
 -- Since Chairside is sold per-location as a monthly subscription, multi-tenancy starts here.
-CREATE TABLE clinics (
+CREATE TABLE IF NOT EXISTS clinics (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     subdomain citext UNIQUE NOT NULL,
@@ -24,10 +24,10 @@ CREATE TABLE clinics (
 );
 
 -- Index for quick lookups by subdomain
-CREATE INDEX idx_clinics_subdomain ON clinics(subdomain);
+CREATE INDEX IF NOT EXISTS idx_clinics_subdomain ON clinics(subdomain);
 
 -- 3. PATIENTS
-CREATE TABLE patients (
+CREATE TABLE IF NOT EXISTS patients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     first_name VARCHAR(100) NOT NULL,
@@ -44,11 +44,11 @@ CREATE TABLE patients (
 );
 
 -- Indexes for patient lookups
-CREATE INDEX idx_patients_clinic_name ON patients(clinic_id, last_name, first_name);
-CREATE INDEX idx_patients_recall ON patients(clinic_id, next_recall_due_date) WHERE next_recall_due_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_patients_clinic_name ON patients(clinic_id, last_name, first_name);
+CREATE INDEX IF NOT EXISTS idx_patients_recall ON patients(clinic_id, next_recall_due_date) WHERE next_recall_due_date IS NOT NULL;
 
 -- 4. APPOINTMENTS
-CREATE TABLE appointments (
+CREATE TABLE IF NOT EXISTS appointments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
@@ -66,14 +66,14 @@ CREATE TABLE appointments (
 );
 
 -- Index foreign keys and common query paths
-CREATE INDEX idx_appointments_clinic_date ON appointments(clinic_id, start_time DESC);
-CREATE INDEX idx_appointments_patient ON appointments(patient_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_clinic_date ON appointments(clinic_id, start_time DESC);
+CREATE INDEX IF NOT EXISTS idx_appointments_patient ON appointments(patient_id);
 -- Exclusion constraint to prevent double-booking a chair at the same clinic
-CREATE INDEX idx_appointments_chair_overlap ON appointments(clinic_id, chair_number, start_time, end_time);
+CREATE INDEX IF NOT EXISTS idx_appointments_chair_overlap ON appointments(clinic_id, chair_number, start_time, end_time);
 
 -- 5. BOOKING SLOTS (For Online Self-Booking Widget)
 -- Dynamically managed availability slots based on clinic hours & chair availability
-CREATE TABLE booking_slots (
+CREATE TABLE IF NOT EXISTS booking_slots (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     chair_number INT NOT NULL CHECK (chair_number BETWEEN 1 AND 4),
@@ -84,12 +84,12 @@ CREATE TABLE booking_slots (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_booking_slots_lookup 
+CREATE INDEX IF NOT EXISTS idx_booking_slots_lookup 
 ON booking_slots(clinic_id, start_time) 
 WHERE is_reserved = FALSE OR (is_reserved = TRUE AND reserved_until < NOW());
 
 -- 6. AUTOMATED SMS REMINDER STATUSES
-CREATE TABLE sms_reminders (
+CREATE TABLE IF NOT EXISTS sms_reminders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
@@ -107,15 +107,15 @@ CREATE TABLE sms_reminders (
 );
 
 -- Index for background cron/worker to find pending messages to send
-CREATE INDEX idx_sms_reminders_queue 
+CREATE INDEX IF NOT EXISTS idx_sms_reminders_queue 
 ON sms_reminders(status, scheduled_for) 
 WHERE status = 'pending';
 
-CREATE INDEX idx_sms_reminders_patient ON sms_reminders(patient_id);
+CREATE INDEX IF NOT EXISTS idx_sms_reminders_patient ON sms_reminders(patient_id);
 
 -- 7. INSURANCE PRE-AUTHORIZATION TRACKER
 -- Specifically built to solve the "Sticky Note" problem for high-production cases
-CREATE TABLE pre_authorizations (
+CREATE TABLE IF NOT EXISTS pre_authorizations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
@@ -124,16 +124,27 @@ CREATE TABLE pre_authorizations (
     policy_member_id VARCHAR(100) NOT NULL,
     treatment_description VARCHAR(255) NOT NULL, -- e.g., "Crown for Tooth #14"
     estimated_cost_cents BIGINT NOT NULL, -- Keep everything in cents to avoid decimal rounding errors
+    estimated_copay_cents BIGINT NOT NULL DEFAULT 0, -- Estimated patient portion of payment
     status VARCHAR(50) NOT NULL DEFAULT 'draft', -- draft, submitted, pending_info, approved, denied
     submitted_at TIMESTAMPTZ,
     responded_at TIMESTAMPTZ,
+    deadline_date DATE, -- Authorization decision deadline or expiration date
+    claim_reference_number VARCHAR(100), -- Unique insurance identifier
     notes TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_pre_auth_status CHECK (status IN ('draft', 'submitted', 'pending_info', 'approved', 'denied'))
 );
 
--- Index for the visual Kanban Board (filtering by clinic & status)
-CREATE INDEX idx_pre_auths_kanban ON pre_authorizations(clinic_id, status, updated_at DESC);
+-- Optimized Compound Index for Kanban Board lookups by status & deadline date
+CREATE INDEX IF NOT EXISTS idx_pre_auths_kanban_dashboard 
+ON pre_authorizations(clinic_id, status, deadline_date ASC NULLS LAST, updated_at DESC);
+
+-- Partial index for active alerts on urgent upcoming deadlines
+CREATE INDEX IF NOT EXISTS idx_pre_auths_urgent_deadlines
+ON pre_authorizations(clinic_id, deadline_date ASC)
+WHERE status IN ('submitted', 'pending_info');
 
 -- 8. TRIGGER FOR AUTO-UPDATED TIMESTAMPS
 CREATE OR REPLACE FUNCTION update_modified_column()
@@ -144,11 +155,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Apply timestamp triggers
+-- Apply timestamp triggers safely
+DROP TRIGGER IF EXISTS update_clinics_modtime ON clinics;
 CREATE TRIGGER update_clinics_modtime BEFORE UPDATE ON clinics FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+
+DROP TRIGGER IF EXISTS update_patients_modtime ON patients;
 CREATE TRIGGER update_patients_modtime BEFORE UPDATE ON patients FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+
+DROP TRIGGER IF EXISTS update_appointments_modtime ON appointments;
 CREATE TRIGGER update_appointments_modtime BEFORE UPDATE ON appointments FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+
+DROP TRIGGER IF EXISTS update_sms_reminders_modtime ON sms_reminders;
 CREATE TRIGGER update_sms_reminders_modtime BEFORE UPDATE ON sms_reminders FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+
+DROP TRIGGER IF EXISTS update_pre_authorizations_modtime ON pre_authorizations;
 CREATE TRIGGER update_pre_authorizations_modtime BEFORE UPDATE ON pre_authorizations FOR EACH ROW EXECUTE FUNCTION update_modified_column();
 
 COMMIT;
